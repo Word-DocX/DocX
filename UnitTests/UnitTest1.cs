@@ -834,6 +834,7 @@ namespace UnitTests
 
                 // Simple
                 Paragraph p1 = document.InsertParagraph("AC");
+                p1 = p1.InsertParagraphAfterSelf("AB");
                 p1.InsertHyperlink(h); Assert.IsTrue(p1.Text == "linkAC");
                 p1.InsertHyperlink(h, p1.Text.Length); Assert.IsTrue(p1.Text == "linkAClink");
                 p1.InsertHyperlink(h, p1.Text.IndexOf("C")); Assert.IsTrue(p1.Text == "linkAlinkClink");
@@ -1273,5 +1274,35 @@ namespace UnitTests
                 }
             }
         }
+
+        [TestMethod]
+        public void Test_ParentContainer_When_Creating_Doc()
+        {
+          using (DocX document = DocX.Create("Test.docx"))
+          {
+            document.AddHeaders();
+            Paragraph p1 = document.Headers.first.InsertParagraph("Test");
+
+            Assert.IsTrue(p1.ParentContainer == ContainerType.Header);
+          }
+        }
+
+
+        [TestMethod]
+        public void Test_ParentContainer_When_Reading_Doc()
+        {
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\" + "Tables.docx"))
+          {
+            List<Paragraph> paragraphs = document.Paragraphs;
+
+            Paragraph p1 = paragraphs[0];
+
+            Assert.IsTrue(p1.ParentContainer == ContainerType.Cell);
+          }
+
+        }
+
+
+
     }
 }

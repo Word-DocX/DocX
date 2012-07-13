@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>StrongNameKey.pfx</AssemblyOriginatorKeyFile>
@@ -73,6 +73,7 @@
     <None Include="documents\ReplaceTests.docx" />
     <None Include="documents\Tables.docx" />
     <None Include="documents\Template.dotx" />
+    <None Include="documents\TestParent.docx" />
     <None Include="StrongNameKey.pfx" />
   </ItemGroup>
   <ItemGroup>

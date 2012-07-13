@@ -2033,7 +2033,8 @@ namespace Novacode
             var ps = package.GetParts();
 
             //document.endnotesPart = HelperFunctions.GetPart();
-            foreach (var rel in document.mainPart.GetRelationships())
+            
+foreach (var rel in document.mainPart.GetRelationships())
             {
                 switch (rel.RelationshipType)
                 {

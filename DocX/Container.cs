@@ -66,11 +66,15 @@ namespace Novacode
                 {
                     if ((p.Xml.ElementsAfterSelf().FirstOrDefault() != null) && (p.Xml.ElementsAfterSelf().First().Name.Equals(DocX.w + "tbl")))
                         p.FollowingTable = new Table(this.Document, p.Xml.ElementsAfterSelf().First());
+
+                    p.ParentContainer = GetParentFromXmlName(p.Xml.Ancestors().First().Name.LocalName);
                 }
                 
                 return paragraphs;
             }
         }
+
+      public ContainerType ParentContainer;
 
         internal List<Paragraph> GetParagraphs()
         {
@@ -98,9 +102,14 @@ namespace Novacode
 
             else
             {
-                if (Xml.HasElements)
-                    foreach (XElement e in Xml.Elements())
-                        GetParagraphsRecursive(e, ref index, ref paragraphs);
+              if (Xml.HasElements)
+              {
+                XElement parentElement = null;
+                foreach (XElement e in Xml.Elements())
+                {
+                  GetParagraphsRecursive(e, ref index, ref paragraphs);
+                }
+              }
             }
         }
 
@@ -291,6 +300,8 @@ namespace Novacode
                 );
             }
 
+            GetParent(p);
+
             return p;
         }
 
@@ -359,6 +370,9 @@ namespace Novacode
 
             Paragraph newParagraph = new Paragraph(Document, newXElement, index);
             Document.paragraphLookup.Add(index, newParagraph);
+
+            GetParent(newParagraph);
+
             return newParagraph;
         }
 
@@ -384,11 +398,71 @@ namespace Novacode
             else
                 Xml.Add(newParagraph);
 
-            return newParagraph;
+
+            GetParent(newParagraph);
+
+          return newParagraph;
         }
 
-        public virtual Paragraph InsertParagraph(string text)
+
+        private ContainerType GetParentFromXmlName(string xmlName)
         {
+          ContainerType parent;
+
+          switch (xmlName)
+          {
+            case "p":
+              parent = ContainerType.Paragraph;
+              break;
+            case "tbl":
+              parent = ContainerType.Table;
+              break;
+            case "sectPr":
+              parent = ContainerType.Section;
+              break;
+            case "tc":
+              parent = ContainerType.Cell;
+              break;
+            default:
+              parent = ContainerType.None;
+              break;
+          }
+          return parent;
+        }
+
+      private void GetParent(Paragraph newParagraph)
+      {
+        var containerType = GetType();
+
+        switch (containerType.Name)
+        {
+          case "Table":
+            newParagraph.ParentContainer = ContainerType.Table;
+            break;
+          case "TOC":
+            newParagraph.ParentContainer = ContainerType.TOC;
+            break;
+          case "Section":
+            newParagraph.ParentContainer = ContainerType.Section;
+            break;
+          case "Cell":
+            newParagraph.ParentContainer = ContainerType.Cell;
+            break;
+          case "Header":
+            newParagraph.ParentContainer = ContainerType.Header;
+            break;
+          case "Footer":
+            newParagraph.ParentContainer = ContainerType.Footer;
+            break;
+          case "Paragraph":
+            newParagraph.ParentContainer = ContainerType.Paragraph;
+            break;
+        }
+      }
+
+      public virtual Paragraph InsertParagraph(string text)
+        {
+
             return InsertParagraph(text, false, new Formatting());
         }
 
@@ -409,7 +483,11 @@ namespace Novacode
 
             Xml.Add(newParagraph);
 
-            return Paragraphs.Last();
+          var paragraphAdded = Paragraphs.Last();
+
+           GetParent(paragraphAdded);
+
+            return paragraphAdded;
         }
 
         public virtual Paragraph InsertEquation(string equation)

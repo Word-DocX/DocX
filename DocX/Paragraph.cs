@@ -26,6 +26,8 @@ namespace Novacode
         // This paragraphs text alignment
         private Alignment alignment;
 
+        public ContainerType ParentContainer;
+
         internal int startIndex, endIndex;
 
         /// <summary>
@@ -212,8 +214,9 @@ namespace Novacode
             get { return docProperties; }
         }
 
-        internal Paragraph(DocX document, XElement xml, int startIndex):base(document, xml)
-        {           
+        internal Paragraph(DocX document, XElement xml, int startIndex, ContainerType parent = ContainerType.None):base(document, xml)
+        {
+            ParentContainer = parent;
             this.startIndex = startIndex;
             this.endIndex = startIndex + GetElementTextLength(xml);
 
