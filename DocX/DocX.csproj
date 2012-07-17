@@ -64,7 +64,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>StrongNameFile.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -104,6 +105,7 @@
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="Hyperlink.cs" />
     <Compile Include="PageLayout.cs" />
+    <Compile Include="Section.cs" />
     <Compile Include="_BaseClasses.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="_Enumerations.cs" />
@@ -116,9 +118,6 @@
     <Compile Include="_Extensions.cs">
       <SubType>Code</SubType>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="StrongNameFile.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="License\License.html" />

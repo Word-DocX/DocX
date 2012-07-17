@@ -76,6 +76,7 @@ namespace Novacode
 
       public ContainerType ParentContainer;
 
+
         internal List<Paragraph> GetParagraphs()
         {
             // Need some memory that can be updated by the recursive search.
@@ -104,7 +105,6 @@ namespace Novacode
             {
               if (Xml.HasElements)
               {
-                XElement parentElement = null;
                 foreach (XElement e in Xml.Elements())
                 {
                   GetParagraphsRecursive(e, ref index, ref paragraphs);
@@ -398,7 +398,6 @@ namespace Novacode
             else
                 Xml.Add(newParagraph);
 
-
             GetParent(newParagraph);
 
           return newParagraph;
@@ -411,6 +410,9 @@ namespace Novacode
 
           switch (xmlName)
           {
+            case "body":
+              parent = ContainerType.Body;
+              break;
             case "p":
               parent = ContainerType.Paragraph;
               break;
@@ -436,6 +438,10 @@ namespace Novacode
 
         switch (containerType.Name)
         {
+          
+          case "Body":
+            newParagraph.ParentContainer = ContainerType.Body;
+            break;
           case "Table":
             newParagraph.ParentContainer = ContainerType.Table;
             break;

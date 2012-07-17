@@ -1,5 +1,15 @@
 ﻿namespace Novacode
 {
+
+  public enum SectionBreakType
+  {
+    defaultNextPage,
+    evenPage,
+    oddPage,
+    continuous
+  }
+
+
   public enum ContainerType
   {
     None,
@@ -9,7 +19,8 @@
     Table,
     Header,
     Footer,
-    Paragraph
+    Paragraph,
+    Body
   }
 
   public enum PageNumberFormat

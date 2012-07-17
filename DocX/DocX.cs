@@ -583,6 +583,10 @@ namespace Novacode
                 reference = "headerReference";
 
             // Get the Id of the [default, even or first] [Header or Footer]
+
+          var first = mainDoc.Descendants(XName.Get("body", DocX.w.NamespaceName)).Descendants();
+
+
             string Id =
             (
                 from e in mainDoc.Descendants(XName.Get("body", DocX.w.NamespaceName)).Descendants()
@@ -620,6 +624,19 @@ namespace Novacode
 
             // If we got this far something went wrong.
             return null;
+        }
+
+
+
+        public List<Section> GetSections()
+        {
+
+         return
+                (
+                    from t in Xml.Descendants(DocX.w + "sectPr")
+                    select new Section(Document, t)
+                ).ToList();
+
         }
 
         // Get the word\document.xml part
@@ -1975,8 +1992,12 @@ namespace Novacode
             footers.even = document.GetFooterByType("even");
             footers.first = document.GetFooterByType("first");
 
+            //Added this for section enhancement..
+            var sect = document.mainDoc.Descendants(XName.Get("sectPr", DocX.w.NamespaceName));
+
+
             //// Get the sectPr for this document.
-            //XElement sectPr = document.mainDoc.Descendants(XName.Get("sectPr", DocX.w.NamespaceName)).Single();
+            //XElement sect = document.mainDoc.Descendants(XName.Get("sectPr", DocX.w.NamespaceName)).Single();
 
             //if (sectPr != null)
             //{
@@ -3679,6 +3700,7 @@ foreach (var rel in document.mainPart.GetRelationships())
                 return l;
             }
         }
+
 
         /// <summary>
         /// Create an equation and insert it in the new paragraph
