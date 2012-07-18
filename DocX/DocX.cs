@@ -28,6 +28,8 @@ namespace Novacode
         static internal XNamespace wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
         static internal XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
         static internal XNamespace c = "http://schemas.openxmlformats.org/drawingml/2006/chart";
+
+        static internal XNamespace wx = "http://schemas.microsoft.com/office/word/2003/auxHint";
         #endregion
 
         internal float getMarginAttribute(XName name)
@@ -633,8 +635,8 @@ namespace Novacode
                     select new Paragraph(Document, t, 0)
                 ).ToList();
 
-            var parasInASection = new List<Paragraph>();
-            var sections = new List<Section>();
+          var parasInASection = new List<Paragraph>();
+          var sections = new List<Section>();
             
           foreach (var para in allParas)
             {
@@ -647,13 +649,22 @@ namespace Novacode
                }
                else
                {
+                 //Remove the sectpr node
+                 //para.Xml.Descendants().First(s => s.Name.LocalName == "sectPr").Remove();
                  parasInASection.Add(para);
                  var section = new Section(Document, sectionInPara) {sectionParas = parasInASection};
                  sections.Add(section);
                  parasInASection = new List<Paragraph>();
                }
 
-              }
+             }
+
+           //At this point parasInASection contains the paragraphs affiliated with the base section
+          //Find base section and insert it in section list
+          XElement body = mainDoc.Root.Element(XName.Get("body", DocX.w.NamespaceName));
+          XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
+          var baseSection = new Section(Document, baseSectionXml) { sectionParas = parasInASection };
+          sections.Add(baseSection);
 
           return sections;
         }
