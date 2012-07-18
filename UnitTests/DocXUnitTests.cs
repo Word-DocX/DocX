@@ -1310,10 +1310,14 @@ namespace UnitTests
           {
             var sections = document.GetSections();
 
-            Assert.IsTrue(sections.Count() == 3);
+            Assert.IsTrue(sections.Count() == 4);
           }
 
         }
+
+      //Add test to ensure paragraphs match the appropriate section
+
+
 
 
     }

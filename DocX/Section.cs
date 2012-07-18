@@ -13,6 +13,9 @@ namespace Novacode
     {
     }
 
+    public List<Paragraph> sectionParas { get; set; }
+
+
     public override List<Paragraph> Paragraphs
     {
       get

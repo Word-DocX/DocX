@@ -584,9 +584,6 @@ namespace Novacode
 
             // Get the Id of the [default, even or first] [Header or Footer]
 
-          var first = mainDoc.Descendants(XName.Get("body", DocX.w.NamespaceName)).Descendants();
-
-
             string Id =
             (
                 from e in mainDoc.Descendants(XName.Get("body", DocX.w.NamespaceName)).Descendants()
@@ -631,12 +628,34 @@ namespace Novacode
         public List<Section> GetSections()
         {
 
-         return
-                (
-                    from t in Xml.Descendants(DocX.w + "sectPr")
-                    select new Section(Document, t)
+          var allParas = (
+                    from t in Xml.Descendants(DocX.w + "p")
+                    select new Paragraph(Document, t, 0)
                 ).ToList();
 
+            var parasInASection = new List<Paragraph>();
+            var sections = new List<Section>();
+            
+          foreach (var para in allParas)
+            {
+              
+              var sectionInPara = para.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "sectPr");
+
+               if (sectionInPara == null)
+               {
+                 parasInASection.Add(para);
+               }
+               else
+               {
+                 parasInASection.Add(para);
+                 var section = new Section(Document, sectionInPara) {sectionParas = parasInASection};
+                 sections.Add(section);
+                 parasInASection = new List<Paragraph>();
+               }
+
+              }
+
+          return sections;
         }
 
         // Get the word\document.xml part
