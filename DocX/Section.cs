@@ -13,18 +13,7 @@ namespace Novacode
     {
     }
 
-    public List<Paragraph> sectionParas { get; set; }
-
-
-    public override List<Paragraph> Paragraphs
-    {
-      get
-      {
-        List<Paragraph> l = base.Paragraphs;
-     //   l.ForEach(x => x.mainPart = mainPart);
-        return l;
-      }
-    }
+    public List<Paragraph> SectionParagraphs { get; set; }
 
     public override List<Table> Tables
     {

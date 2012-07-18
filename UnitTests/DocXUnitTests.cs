@@ -1304,20 +1304,49 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Count_When_Reading_Doc()
         {
-
-         // using (DocX document = DocX.Load("C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\" + "TestParent.docx"))
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithHeadingBreaks.docx"))
+        //  using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
           {
             var sections = document.GetSections();
 
-            Assert.IsTrue(sections.Count() == 4);
+            Assert.AreEqual(sections.Count(), 4);
           }
 
         }
 
-      //Add test to ensure paragraphs match the appropriate section
+
+        [TestMethod]
+        public void Test_Section_Paragraph_Count_Match_When_Reading_Doc()
+        {
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaksMultiParagraph.docx"))
+          {
+
+            var sections = document.GetSections();
+
+            Assert.AreEqual(sections[0].Paragraphs.Count, 2);
+            Assert.AreEqual(sections[1].SectionParagraphs.Count, 1);
+            Assert.AreEqual(sections[2].SectionParagraphs.Count, 2);
+            Assert.AreEqual(sections[3].SectionParagraphs.Count, 1);
+          }
+        }
 
 
+
+        [TestMethod]
+        public void Test_Section_Paragraph_Content_Match_When_Reading_Doc()
+        {
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
+          {
+            
+            var sections = document.GetSections();
+
+            Assert.IsTrue(sections[0].SectionParagraphs[0].Text.Contains("Section 1"));
+            Assert.IsTrue(sections[1].SectionParagraphs[0].Text.Contains("Section 2"));
+            Assert.IsTrue(sections[2].SectionParagraphs[0].Text.Contains("Section 3"));
+            Assert.IsTrue(sections[3].SectionParagraphs[0].Text.Contains("Section 4"));
+
+          }
+        }
 
 
     }

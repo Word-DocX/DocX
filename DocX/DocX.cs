@@ -649,21 +649,19 @@ namespace Novacode
                }
                else
                {
-                 //Remove the sectpr node
-                 //para.Xml.Descendants().First(s => s.Name.LocalName == "sectPr").Remove();
                  parasInASection.Add(para);
-                 var section = new Section(Document, sectionInPara) {sectionParas = parasInASection};
+                 var section = new Section(Document, sectionInPara) {SectionParagraphs = parasInASection};
                  sections.Add(section);
                  parasInASection = new List<Paragraph>();
                }
 
              }
 
-           //At this point parasInASection contains the paragraphs affiliated with the base section
+           //At this point parasInASection contains the paragraphs affiliated only with the base section
           //Find base section and insert it in section list
           XElement body = mainDoc.Root.Element(XName.Get("body", DocX.w.NamespaceName));
           XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
-          var baseSection = new Section(Document, baseSectionXml) { sectionParas = parasInASection };
+          var baseSection = new Section(Document, baseSectionXml) { SectionParagraphs = parasInASection };
           sections.Add(baseSection);
 
           return sections;
