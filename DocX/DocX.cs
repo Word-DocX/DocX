@@ -630,10 +630,7 @@ namespace Novacode
         public List<Section> GetSections()
         {
 
-          var allParas = (
-                    from t in Xml.Descendants(DocX.w + "p")
-                    select new Paragraph(Document, t, 0)
-                ).ToList();
+          var allParas = Paragraphs;
 
           var parasInASection = new List<Paragraph>();
           var sections = new List<Section>();
@@ -657,8 +654,6 @@ namespace Novacode
 
              }
 
-           //At this point parasInASection contains the paragraphs affiliated only with the base section
-          //Find base section and insert it in section list
           XElement body = mainDoc.Root.Element(XName.Get("body", DocX.w.NamespaceName));
           XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
           var baseSection = new Section(Document, baseSectionXml) { SectionParagraphs = parasInASection };

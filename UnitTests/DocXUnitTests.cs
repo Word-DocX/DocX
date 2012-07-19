@@ -1286,6 +1286,17 @@ namespace UnitTests
           }
         }
 
+        [TestMethod]
+        public void Test_Section_Count_When_Creating_Doc()
+        {
+          using (DocX document = DocX.Create("TestSectionCount.docx"))
+          {
+            var sections = document.GetSections();
+
+            Assert.AreEqual(sections.Count(), 4);
+          }
+
+        }
 
         [TestMethod]
         public void Test_ParentContainer_When_Reading_Doc()
@@ -1323,7 +1334,7 @@ namespace UnitTests
 
             var sections = document.GetSections();
 
-            Assert.AreEqual(sections[0].Paragraphs.Count, 2);
+            Assert.AreEqual(sections[0].SectionParagraphs.Count, 2);
             Assert.AreEqual(sections[1].SectionParagraphs.Count, 1);
             Assert.AreEqual(sections[2].SectionParagraphs.Count, 2);
             Assert.AreEqual(sections[3].SectionParagraphs.Count, 1);
