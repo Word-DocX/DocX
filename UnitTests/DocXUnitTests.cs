@@ -1291,6 +1291,8 @@ namespace UnitTests
         {
           using (DocX document = DocX.Create("TestSectionCount.docx"))
           {
+            document.InsertSection("test");
+
             var sections = document.GetSections();
 
             Assert.AreEqual(sections.Count(), 4);
@@ -1315,8 +1317,8 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Count_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithHeadingBreaks.docx"))
-        //  using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
+        //  using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithHeadingBreaks.docx"))
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
           {
             var sections = document.GetSections();
 

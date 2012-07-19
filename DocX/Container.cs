@@ -466,15 +466,41 @@ namespace Novacode
         }
       }
 
-      public virtual Paragraph InsertParagraph(string text)
+      public virtual void InsertSection(string text)
+      {
+
+         InsertSection(text, false, new Formatting());
+      }
+
+      public virtual void InsertSection(string text, bool trackChanges)
+      {
+         InsertSection(text, trackChanges, new Formatting());
+      }
+
+      public virtual void InsertSection(string text, bool trackChanges, Formatting formatting)
+        {
+          var newParagraphSection = new XElement
+          (
+              XName.Get("p", DocX.w.NamespaceName), new XElement(XName.Get("pPr", DocX.w.NamespaceName), new XElement(XName.Get("sectPr", DocX.w.NamespaceName), new XElement(XName.Get("type", DocX.w.NamespaceName),new XAttribute("value", "continuous") ))), HelperFunctions.FormatInput(text, formatting.Xml)
+          );
+
+          if (trackChanges)
+            newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+
+          Xml.Add(newParagraphSection);
+
+        }
+
+
+        public virtual Paragraph InsertParagraph(string text)
         {
 
-            return InsertParagraph(text, false, new Formatting());
+          return InsertParagraph(text, false, new Formatting());
         }
 
         public virtual Paragraph InsertParagraph(string text, bool trackChanges)
         {
-            return InsertParagraph(text, trackChanges, new Formatting());
+          return InsertParagraph(text, trackChanges, new Formatting());
         }
 
         public virtual Paragraph InsertParagraph(string text, bool trackChanges, Formatting formatting)
