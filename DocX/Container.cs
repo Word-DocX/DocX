@@ -68,6 +68,10 @@ namespace Novacode
                         p.FollowingTable = new Table(this.Document, p.Xml.ElementsAfterSelf().First());
 
                     p.ParentContainer = GetParentFromXmlName(p.Xml.Ancestors().First().Name.LocalName);
+
+                    var paraNumProperties = p.Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr");
+
+                    p.IsListItem = paraNumProperties != null;
                 }
                 
                 return paragraphs;

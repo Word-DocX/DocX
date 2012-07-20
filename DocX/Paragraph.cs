@@ -28,6 +28,8 @@ namespace Novacode
 
         public ContainerType ParentContainer;
 
+      public bool IsListItem;
+
         internal int startIndex, endIndex;
 
         /// <summary>
