@@ -1289,16 +1289,38 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Count_When_Creating_Doc()
         {
+          //This adds a section break - so insert paragraphs, and follow it up by a section break/paragraph
           using (DocX document = DocX.Create("TestSectionCount.docx"))
           {
-            document.InsertSection("test");
-
+            document.InsertSection();
+            
             var sections = document.GetSections();
 
-            Assert.AreEqual(sections.Count(), 4);
+            Assert.AreEqual(sections.Count(), 2);
           }
 
         }
+
+
+        [TestMethod]
+        public void Test_Sections_And_Paragraphs_When_Creating_Doc()
+        {
+          //This adds a section break - so insert paragraphs, and follow it up by a section break/paragraph
+          using (DocX document = DocX.Create("TestSectionAndPararaph.docx"))
+          {
+            //Add 2 paras and a break
+            document.InsertParagraph("First Para");
+            document.InsertParagraph("Second Para");
+            document.InsertSection();
+            document.InsertParagraph("This is default para");
+
+            var sections = document.GetSections();
+
+            Assert.AreEqual(sections.Count(), 2);
+          }
+
+        }
+
 
         [TestMethod]
         public void Test_ParentContainer_When_Reading_Doc()
@@ -1317,7 +1339,6 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Count_When_Reading_Doc()
         {
-        //  using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithHeadingBreaks.docx"))
           using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
           {
             var sections = document.GetSections();

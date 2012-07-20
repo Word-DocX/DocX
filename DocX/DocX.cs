@@ -2016,7 +2016,7 @@ namespace Novacode
             footers.first = document.GetFooterByType("first");
 
             //Added this for section enhancement..
-            var sect = document.mainDoc.Descendants(XName.Get("sectPr", DocX.w.NamespaceName));
+            //var sect = document.mainDoc.Descendants(XName.Get("sectPr", DocX.w.NamespaceName));
 
 
             //// Get the sectPr for this document.
