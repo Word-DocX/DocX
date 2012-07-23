@@ -71,6 +71,27 @@ namespace Novacode
 
                     var paraNumProperties = p.Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr");
 
+                    var ilvlNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "ilvl");
+                    var ilvlValue = ilvlNode.Attribute(DocX.w + "val").Value;
+
+                    var numIdNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "numId");
+                    var numIdValue = numIdNode.Attribute(DocX.w + "val").Value;
+
+
+                  //find num node in numbering 
+                  var numNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "num");
+                  XElement numNode; 
+
+                  foreach (XElement node in numNodes)
+                  {
+
+                    if (node.Attribute(DocX.w + "numId").Value.Equals(numIdValue))
+                    {
+                      numNode = node;
+                      break;
+                    }
+                  }
+
                     p.IsListItem = paraNumProperties != null;
 
                     if (p.IsListItem)

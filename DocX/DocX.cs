@@ -28,8 +28,6 @@ namespace Novacode
         static internal XNamespace wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
         static internal XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
         static internal XNamespace c = "http://schemas.openxmlformats.org/drawingml/2006/chart";
-
-        static internal XNamespace wx = "http://schemas.microsoft.com/office/word/2003/auxHint";
         #endregion
 
         internal float getMarginAttribute(XName name)
@@ -2014,10 +2012,6 @@ namespace Novacode
             footers.odd = document.GetFooterByType("default");
             footers.even = document.GetFooterByType("even");
             footers.first = document.GetFooterByType("first");
-
-            //Added this for section enhancement..
-            //var sect = document.mainDoc.Descendants(XName.Get("sectPr", DocX.w.NamespaceName));
-
 
             //// Get the sectPr for this document.
             //XElement sect = document.mainDoc.Descendants(XName.Get("sectPr", DocX.w.NamespaceName)).Single();
