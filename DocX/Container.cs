@@ -71,32 +71,11 @@ namespace Novacode
 
                     var paraNumProperties = p.Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr");
 
-                    var ilvlNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "ilvl");
-                    var ilvlValue = ilvlNode.Attribute(DocX.w + "val").Value;
-
-                    var numIdNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "numId");
-                    var numIdValue = numIdNode.Attribute(DocX.w + "val").Value;
-
-
-                  //find num node in numbering 
-                  var numNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "num");
-                  XElement numNode; 
-
-                  foreach (XElement node in numNodes)
-                  {
-
-                    if (node.Attribute(DocX.w + "numId").Value.Equals(numIdValue))
-                    {
-                      numNode = node;
-                      break;
-                    }
-                  }
-
                     p.IsListItem = paraNumProperties != null;
 
-                    if (p.IsListItem)
+                  if (p.IsListItem)
                     {
-                      GetParagraphStyleValue(p);
+                      GetListItemType(paraNumProperties, p);
                     }
                 }
                 
@@ -104,17 +83,42 @@ namespace Novacode
             }
         }
 
-      private void GetParagraphStyleValue(Paragraph p)
+      private void GetListItemType(XElement paraNumProperties, Paragraph p)
       {
-        XElement paragraphStyle = p.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "pStyle");
+        var ilvlNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "ilvl");
+        var ilvlValue = ilvlNode.Attribute(DocX.w + "val").Value;
 
-        if (paragraphStyle != null)
+        var numIdNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "numId");
+        var numIdValue = numIdNode.Attribute(DocX.w + "val").Value;
+
+        //find num node in numbering 
+        var numNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "num");
+        XElement numNode = numNodes.FirstOrDefault(node => node.Attribute(DocX.w + "numId").Value.Equals(numIdValue));
+
+        //Get abstractNumId node and its value from numNode
+        var abstractNumIdNode = numNode.Descendants().First(n => n.Name.LocalName == "abstractNumId");
+        var abstractNumNodeValue = abstractNumIdNode.Attribute(DocX.w + "val").Value;
+
+        var abstractNumNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "abstractNum");
+        XElement abstractNumNode =
+          abstractNumNodes.FirstOrDefault(node => node.Attribute(DocX.w + "abstractNumId").Value.Equals(abstractNumNodeValue));
+
+        //Find lvl node
+        var lvlNodes = abstractNumNode.Descendants().Where(n => n.Name.LocalName == "lvl");
+        XElement lvlNode = null;
+        foreach (XElement node in lvlNodes)
         {
-          var paragraphStyleValue = paragraphStyle.Attribute(DocX.w + "val");
-          if (paragraphStyleValue != null)
-            p.ListItemType = GetListItemType(paragraphStyleValue.Value);
+          if (node.Attribute(DocX.w + "ilvl").Value.Equals(ilvlValue))
+          {
+            lvlNode = node;
+            break;
+          }
         }
+
+        var numFmtNode = lvlNode.Descendants().First(n => n.Name.LocalName == "numFmt");
+        p.ListItemType = GetListItemType(numFmtNode.Attribute(DocX.w + "val").Value);
       }
+
 
       public ContainerType ParentContainer;
 
@@ -515,13 +519,10 @@ namespace Novacode
 
         switch (styleName)
         {
-          case "ListParagraph":
-            listItemType = ListItemType.ListParagraph;
-            break;
-          case "Bulleted":
+          case "bullet":
             listItemType = ListItemType.Bulleted;
             break;
-          case "Numbered":
+          case "decimal":
             listItemType = ListItemType.Numbered;
             break;
           default:
