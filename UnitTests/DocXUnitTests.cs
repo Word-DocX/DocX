@@ -1325,7 +1325,8 @@ namespace UnitTests
         [TestMethod]
         public void Test_ParentContainer_When_Reading_Doc()
         {
-         using (DocX document = DocX.Load("C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\" + "Tables.docx"))
+        // using (DocX document = DocX.Load("C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\" + "Tables.docx"))
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\" + "testdoc_OrderedList.docx"))
           {
             List<Paragraph> paragraphs = document.Paragraphs;
 
@@ -1381,6 +1382,78 @@ namespace UnitTests
 
           }
         }
+
+
+
+        [TestMethod]
+        public void Test_Ordered_List_When_Reading_Doc()
+        {
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_OrderedList.docx"))
+          {
+
+            var sections = document.GetSections();
+
+            Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
+
+            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Numbered);
+            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Numbered);
+            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Numbered);
+          }
+        }
+
+
+
+        [TestMethod]
+        public void Test_Unordered_List_When_Reading_Doc()
+        {
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_UnorderedList.docx"))
+          {
+
+            var sections = document.GetSections();
+
+            Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
+
+            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Bulleted);
+            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Bulleted);
+            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Bulleted);
+          }
+        }
+
+
+        [TestMethod]
+        public void Test_Ordered_Unordered_Lists_When_Reading_Doc()
+        {
+          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_OrderedUnorderedLists.docx"))
+          {
+
+            var sections = document.GetSections();
+
+            Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
+
+            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Bulleted);
+            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Bulleted);
+            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Bulleted);
+
+            Assert.IsTrue(sections[0].SectionParagraphs[3].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[4].IsListItem);
+            Assert.IsTrue(sections[0].SectionParagraphs[5].IsListItem);
+
+            Assert.AreEqual(sections[0].SectionParagraphs[3].ListItemType, ListItemType.Numbered);
+            Assert.AreEqual(sections[0].SectionParagraphs[4].ListItemType, ListItemType.Numbered);
+            Assert.AreEqual(sections[0].SectionParagraphs[5].ListItemType, ListItemType.Numbered);
+
+          }
+        }
+
+
+
+
 
 
     }

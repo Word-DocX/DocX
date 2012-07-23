@@ -72,6 +72,7 @@ namespace Novacode
                     var paraNumProperties = p.Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr");
 
                     p.IsListItem = paraNumProperties != null;
+                  //TODO: If listitem, add list item type (bulleted, numbered) property
                 }
                 
                 return paragraphs;

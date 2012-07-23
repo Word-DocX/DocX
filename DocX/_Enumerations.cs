@@ -1,6 +1,12 @@
 ﻿namespace Novacode
 {
 
+  public enum ListItemType
+  {
+    Bulleted,
+    Numbered
+  }
+
   public enum SectionBreakType
   {
     defaultNextPage,
