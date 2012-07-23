@@ -3,6 +3,8 @@
 
   public enum ListItemType
   {
+    None,
+    ListParagraph,
     Bulleted,
     Numbered
   }

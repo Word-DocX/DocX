@@ -72,12 +72,28 @@ namespace Novacode
                     var paraNumProperties = p.Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr");
 
                     p.IsListItem = paraNumProperties != null;
-                  //TODO: If listitem, add list item type (bulleted, numbered) property
+
+                    if (p.IsListItem)
+                    {
+                      GetParagraphStyleValue(p);
+                    }
                 }
                 
                 return paragraphs;
             }
         }
+
+      private void GetParagraphStyleValue(Paragraph p)
+      {
+        XElement paragraphStyle = p.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "pStyle");
+
+        if (paragraphStyle != null)
+        {
+          var paragraphStyleValue = paragraphStyle.Attribute(DocX.w + "val");
+          if (paragraphStyleValue != null)
+            p.ListItemType = GetListItemType(paragraphStyleValue.Value);
+        }
+      }
 
       public ContainerType ParentContainer;
 
@@ -470,6 +486,31 @@ namespace Novacode
             break;
         }
       }
+
+
+      private ListItemType GetListItemType(string styleName)
+      {
+        ListItemType listItemType;
+
+        switch (styleName)
+        {
+          case "ListParagraph":
+            listItemType = ListItemType.ListParagraph;
+            break;
+          case "Bulleted":
+            listItemType = ListItemType.Bulleted;
+            break;
+          case "Numbered":
+            listItemType = ListItemType.Numbered;
+            break;
+          default:
+            listItemType = ListItemType.None;
+            break;
+        }
+        return listItemType;
+      }
+
+
 
       public virtual void InsertSection()
       {

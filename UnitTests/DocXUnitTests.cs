@@ -35,6 +35,8 @@ namespace UnitTests
             List<string> steps = directory_executing_assembly.Split('\\').ToList();
             steps.RemoveRange(steps.Count() - 3, 3);
             directory_documents = String.Join("\\", steps) + "\\documents\\";
+
+          directory_documents = "C:\\Users\\Faizan\\Desktop\\testdocx\\";
         }
 
         [TestMethod]
@@ -1325,8 +1327,7 @@ namespace UnitTests
         [TestMethod]
         public void Test_ParentContainer_When_Reading_Doc()
         {
-        // using (DocX document = DocX.Load("C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\" + "Tables.docx"))
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\" + "testdoc_OrderedList.docx"))
+          using (DocX document = DocX.Load(directory_documents + "Tables.docx"))
           {
             List<Paragraph> paragraphs = document.Paragraphs;
 
@@ -1340,7 +1341,7 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Count_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
+          using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaks.docx"))
           {
             var sections = document.GetSections();
 
@@ -1353,7 +1354,7 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Paragraph_Count_Match_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaksMultiParagraph.docx"))
+          using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaksMultiParagraph.docx"))
           {
 
             var sections = document.GetSections();
@@ -1370,7 +1371,7 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Paragraph_Content_Match_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_SectionsWithSectionBreaks.docx"))
+          using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaks.docx"))
           {
             
             var sections = document.GetSections();
@@ -1388,7 +1389,7 @@ namespace UnitTests
         [TestMethod]
         public void Test_Ordered_List_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_OrderedList.docx"))
+          using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedList.docx"))
           {
 
             var sections = document.GetSections();
@@ -1408,7 +1409,7 @@ namespace UnitTests
         [TestMethod]
         public void Test_Unordered_List_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_UnorderedList.docx"))
+          using (DocX document = DocX.Load(directory_documents + "testdoc_UnorderedList.docx"))
           {
 
             var sections = document.GetSections();
@@ -1427,7 +1428,7 @@ namespace UnitTests
         [TestMethod]
         public void Test_Ordered_Unordered_Lists_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load("C:\\Users\\Faizan\\Desktop\\testdocx\\" + "testdoc_OrderedUnorderedLists.docx"))
+          using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedUnorderedLists.docx"))
           {
 
             var sections = document.GetSections();
@@ -1450,11 +1451,6 @@ namespace UnitTests
 
           }
         }
-
-
-
-
-
 
     }
 }
