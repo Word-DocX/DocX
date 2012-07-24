@@ -36,7 +36,7 @@ namespace UnitTests
             steps.RemoveRange(steps.Count() - 3, 3);
             directory_documents = String.Join("\\", steps) + "\\documents\\";
 
-          directory_documents = "C:\\Users\\Faizan\\Desktop\\testdocx\\";
+          directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
         }
 
         [TestMethod]
@@ -1437,20 +1437,35 @@ namespace UnitTests
             Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
             Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
 
-            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Bulleted);
-            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Bulleted);
-            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Bulleted);
+            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Numbered);
+            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Numbered);
+            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Numbered);
 
             Assert.IsTrue(sections[0].SectionParagraphs[3].IsListItem);
             Assert.IsTrue(sections[0].SectionParagraphs[4].IsListItem);
             Assert.IsTrue(sections[0].SectionParagraphs[5].IsListItem);
 
-            Assert.AreEqual(sections[0].SectionParagraphs[3].ListItemType, ListItemType.Numbered);
-            Assert.AreEqual(sections[0].SectionParagraphs[4].ListItemType, ListItemType.Numbered);
-            Assert.AreEqual(sections[0].SectionParagraphs[5].ListItemType, ListItemType.Numbered);
+            Assert.AreEqual(sections[0].SectionParagraphs[3].ListItemType, ListItemType.Bulleted);
+            Assert.AreEqual(sections[0].SectionParagraphs[4].ListItemType, ListItemType.Bulleted);
+            Assert.AreEqual(sections[0].SectionParagraphs[5].ListItemType, ListItemType.Bulleted);
 
           }
         }
+
+
+        //[TestMethod]
+        //public void Creating_An_Ordered_List_In_A_Document(){
+         
+        //  using (DocX document = DocX.Create("TestList.docx"))
+        //  {
+        //    document.InsertList(ListItemType.Bulleted);
+
+        //    var lists = document.GetLists();
+
+        //    Assert.AreEqual(lists.Count(), 1);
+        //  }
+
+        //}
 
     }
 }
