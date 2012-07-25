@@ -1453,19 +1453,20 @@ namespace UnitTests
         }
 
 
-        //[TestMethod]
-        //public void Creating_An_Ordered_List_In_A_Document(){
-         
-        //  using (DocX document = DocX.Create("TestList.docx"))
-        //  {
-        //    document.InsertList(ListItemType.Bulleted);
+        [TestMethod]
+        public void Creating_An_Ordered_List_In_A_Document()
+        {
 
-        //    var lists = document.GetLists();
+          using (DocX document = DocX.Create("TestList.docx"))
+          {
+            document.AddList(1); 
 
-        //    Assert.AreEqual(lists.Count(), 1);
-        //  }
+        //   var lists = document.GetLists();
 
-        //}
+        //    Assert.AreEqual(lists.Count, 1);
+          }
+
+        }
 
     }
 }

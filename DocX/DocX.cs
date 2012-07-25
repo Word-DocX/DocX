@@ -1696,6 +1696,41 @@ namespace Novacode
             return t;
         }
 
+
+        public virtual void AddList()
+        {
+          AddList(1);
+        }
+
+      //Todo: add parameter for list type, and perhaps some more params for linking to paragraph styles in styles.xml
+        public void AddList(int numOfListItems, bool trackChanges = false)
+        {
+
+          if (numOfListItems <= 0)
+            throw new ArgumentOutOfRangeException("Number of items in a list should be atleast 1.");
+
+
+          for (int i = 0; i < numOfListItems; i++ )
+          {
+
+            var newParagraphSection = new XElement
+              (
+              XName.Get("p", DocX.w.NamespaceName),
+              new XElement(XName.Get("pPr", DocX.w.NamespaceName),
+                           new XElement(XName.Get("numPr", DocX.w.NamespaceName),
+                                        new XElement(XName.Get("ilvl", DocX.w.NamespaceName)),
+                                        new XElement(XName.Get("numId", DocX.w.NamespaceName))))
+              );
+
+            if (trackChanges)
+              newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+
+            Xml.Add(newParagraphSection);
+          }
+
+        }
+
+
         /// <summary>
         /// Insert a Table into this document. The Table's source can be a completely different document.
         /// </summary>

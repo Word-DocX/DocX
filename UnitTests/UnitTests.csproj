@@ -74,6 +74,12 @@
     <None Include="documents\ReplaceTests.docx" />
     <None Include="documents\Tables.docx" />
     <None Include="documents\Template.dotx" />
+    <None Include="documents\testdoc_OrderedList.docx" />
+    <None Include="documents\testdoc_OrderedUnorderedLists.docx" />
+    <None Include="documents\testdoc_SectionsWithHeadingBreaks.docx" />
+    <None Include="documents\testdoc_SectionsWithSectionBreaks.docx" />
+    <None Include="documents\testdoc_SectionsWithSectionBreaksMultiParagraph.docx" />
+    <None Include="documents\testdoc_UnorderedList.docx" />
     <None Include="documents\TestParent.docx" />
   </ItemGroup>
   <ItemGroup>

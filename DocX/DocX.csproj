@@ -104,6 +104,7 @@
     <Compile Include="Headers.cs" />
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="Hyperlink.cs" />
+    <Compile Include="WordList.cs" />
     <Compile Include="PageLayout.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="_BaseClasses.cs" />
