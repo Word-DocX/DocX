@@ -1702,7 +1702,7 @@ namespace Novacode
           AddList(1);
         }
 
-      //Todo: add parameter for list type, and perhaps some more params for linking to paragraph styles in styles.xml
+      //Todo: add parameter for list type, and perhaps some more params for linking to paragraph styles (numId, ilvl values) in styles.xml - check AddHyperlinkStyleIfNotPresent()
         public void AddList(int numOfListItems, bool trackChanges = false)
         {
 
@@ -1729,6 +1729,66 @@ namespace Novacode
           }
 
         }
+
+        internal XDocument AddStylesForList()
+        {
+          var wordStylesUri = new Uri("/word/styles.xml", UriKind.Relative);
+
+          // If the internal document contains no /word/styles.xml create one.
+          if (!package.PartExists(wordStylesUri))
+            HelperFunctions.AddDefaultStylesXml(package);
+
+          // Load the styles.xml into memory.
+          XDocument wordStyles;
+          using (TextReader tr = new StreamReader(package.GetPart(wordStylesUri).GetStream()))
+            wordStyles = XDocument.Load(tr);
+
+          bool listStyleExists =
+          (
+            from s in wordStyles.Element(w + "styles").Elements()
+            let styleId = s.Attribute(XName.Get("styleId", w.NamespaceName))
+            where (styleId != null && styleId.Value == "ListParagraph")
+            select s
+          ).Any();
+
+          if (!listStyleExists)
+          {
+            var style = new XElement
+            (
+                w + "style",
+                new XAttribute(w + "type", "paragraph"),
+                new XAttribute(w + "styleId", "ListParagraph"),
+                    new XElement(w + "name", new XAttribute(w + "val", "List Paragraph")),
+                    new XElement(w + "basedOn", new XAttribute(w + "val", "Normal")),
+                    new XElement(w + "uiPriority", new XAttribute(w + "val", "34")),
+                    new XElement(w + "qformat"),
+                    new XElement(w + "rsid", new XAttribute(w + "val", "00832EE1")),
+                    new XElement
+                    (
+                        w + "rPr",
+                        new XElement(w + "ind", new XAttribute(w + "left", "720")),
+                        new XElement
+                        (
+                            w + "contextualSpacing"
+                        )
+                    )
+            );
+            wordStyles.Element(w + "styles").Add(style);
+
+            // Save the styles document.
+            using (TextWriter tw = new StreamWriter(package.GetPart(wordStylesUri).GetStream()))
+              wordStyles.Save(tw);
+          }
+
+          return wordStyles;
+        }
+
+
+
+
+
+
+
 
 
         /// <summary>

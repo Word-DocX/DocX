@@ -1459,14 +1459,41 @@ namespace UnitTests
 
           using (DocX document = DocX.Create("TestList.docx"))
           {
-            document.AddList(1); 
+            document.AddList(1);
 
-        //   var lists = document.GetLists();
+            //var lists = document.GetLists();
 
-        //    Assert.AreEqual(lists.Count, 1);
+            //Assert.AreEqual(lists.Count, 1);
           }
 
         }
+
+        [TestMethod]
+        public void When_Creating_A_List_The_ListStyle_Should_Be_Created_In_Document_Styles()
+        {
+
+          using (DocX document = DocX.Create("TestListStyle.docx"))
+          {
+            var style = document.AddStylesForList();
+
+            XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+
+            bool listStyleExists =
+                (
+                  from s in style.Element(w + "styles").Elements()
+                  let styleId = s.Attribute(XName.Get("styleId", w.NamespaceName))
+                  where (styleId != null && styleId.Value == "ListParagraph")
+                  select s
+                ).Any();
+          
+            Assert.IsTrue(listStyleExists);
+
+           }
+
+     
+        }
+
+
 
     }
 }
