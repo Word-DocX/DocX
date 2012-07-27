@@ -1308,7 +1308,7 @@ namespace UnitTests
         public void Test_Sections_And_Paragraphs_When_Creating_Doc()
         {
           //This adds a section break - so insert paragraphs, and follow it up by a section break/paragraph
-          using (DocX document = DocX.Create("TestSectionAndPararaph.docx"))
+          using (DocX document = DocX.Create("TestSectionAndParagraph.docx"))
           {
             //Add 2 paras and a break
             document.InsertParagraph("First Para");
@@ -1321,6 +1321,7 @@ namespace UnitTests
             Assert.AreEqual(sections.Count(), 2);
           }
 
+         
         }
 
 
@@ -1469,7 +1470,7 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void When_Creating_A_List_The_ListStyle_Should_Be_Created_In_Document_Styles()
+        public void WhenCreatingAListTheListStyleShouldExistOrBeCreated()
         {
 
           using (DocX document = DocX.Create("TestListStyle.docx"))
@@ -1489,10 +1490,33 @@ namespace UnitTests
             Assert.IsTrue(listStyleExists);
 
            }
-
-     
         }
 
+
+        [TestMethod]
+        public void WhenGettingListNumValuesForValidListTypesNumberingShouldReturnValues()
+        {
+
+          using (DocX document = DocX.Create("TestListNumberingStyle.docx"))
+          {
+            var listNumValues = document.GetListNumValues(ListItemType.Bulleted);
+
+            Assert.AreEqual(listNumValues.Ilvl, "0");
+            Assert.AreEqual(listNumValues.NumId, "1");
+          }
+        }
+
+        public void WhenGettingListNumValuesForInvalidListTypesNumberingShouldReturnNull()
+        {
+
+          using (DocX document = DocX.Create("TestListNumberingStyle.docx"))
+          {
+            var listNumValues = document.GetListNumValues(ListItemType.None);
+
+            Assert.AreEqual(listNumValues.Ilvl, null);
+            Assert.AreEqual(listNumValues.NumId, null);
+          }
+        }
 
 
     }

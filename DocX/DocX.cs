@@ -1702,13 +1702,15 @@ namespace Novacode
           AddList(1);
         }
 
-      //Todo: add parameter for list type, and perhaps some more params for linking to paragraph styles (numId, ilvl values) in styles.xml - check AddHyperlinkStyleIfNotPresent()
-        public void AddList(int numOfListItems, bool trackChanges = false)
+      //Todo: add parameter for list type, and perhaps some more params for linking to paragraph style (numId, ilvl values) in numbering.xml - check AddHyperlinkStyleIfNotPresent()
+        public void AddList(int numOfListItems, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
 
           if (numOfListItems <= 0)
             throw new ArgumentOutOfRangeException("Number of items in a list should be atleast 1.");
 
+          //TODO: Get numId/ilvl values for list type from numbering.xml - ilvl value 0 for now since its single-level lists
+          var listNumValues = GetListNumValues(listType);
 
           for (int i = 0; i < numOfListItems; i++ )
           {
@@ -1718,7 +1720,7 @@ namespace Novacode
               XName.Get("p", DocX.w.NamespaceName),
               new XElement(XName.Get("pPr", DocX.w.NamespaceName),
                            new XElement(XName.Get("numPr", DocX.w.NamespaceName),
-                                        new XElement(XName.Get("ilvl", DocX.w.NamespaceName)),
+                                        new XElement(XName.Get("ilvl", DocX.w.NamespaceName), new XAttribute(w + "val", "0")), 
                                         new XElement(XName.Get("numId", DocX.w.NamespaceName))))
               );
 
@@ -1729,6 +1731,76 @@ namespace Novacode
           }
 
         }
+
+      public class ListNumValues
+      {
+       public string NumId { get; set; }
+       public string Ilvl { get; set; }
+      }
+
+      public ListNumValues GetListNumValues(ListItemType listItemType)
+      {
+        var numberingUri = new Uri("/word/numbering.xml", UriKind.Relative);
+
+        // If the internal document contains no /word/numbering.xml create one.
+        if (!package.PartExists(numberingUri))
+          HelperFunctions.AddDefaultNumberingXml(package);
+
+        // Load numbering.xml into memory.
+        XDocument numbering;
+        using (TextReader tr = new StreamReader(package.GetPart(numberingUri).GetStream()))
+          numbering = XDocument.Load(tr);
+
+        //find abstractNum with lvl node with numFmt value of listItemType
+        IEnumerable<XElement> abstractNums = numbering.Descendants().Where(s => s.Name.LocalName == "abstractNum");
+        string abstractNumId = null;
+
+        var listNumValues = new ListNumValues();
+
+        foreach (XElement abstractNum in abstractNums)
+        {
+          XElement multiLevelNode = abstractNum.Descendants().First(s => s.Name.LocalName == "multiLevelType");
+
+          abstractNumId = abstractNum.Attribute(w + "abstractNumId").Value;
+
+          //search hybrid multilevel only for single-level list
+          if (multiLevelNode.Attribute(w + "val").Value.Equals("hybridMultilevel"))
+          {
+            var lvlNode = abstractNum.Descendants().First(s => s.Name.LocalName == "lvl");
+
+            var numFmtNode = lvlNode.Descendants().First(s => s.Name.LocalName == "numFmt");
+
+            var numFmtVal = numFmtNode.Attribute(w + "val").Value;
+
+            if ((listItemType == ListItemType.Numbered) && numFmtVal.Equals("decimal"))
+            {
+              listNumValues.Ilvl = lvlNode.Attribute(w + "ilvl").Value;
+              break;
+            }
+            if ((listItemType == ListItemType.Bulleted) && numFmtVal.Equals("bullet"))
+            {
+              listNumValues.Ilvl = lvlNode.Attribute(w + "ilvl").Value;
+              break;
+            }
+          }
+        }
+
+        if (!String.IsNullOrEmpty(listNumValues.Ilvl))
+        {
+          //find num node with abstractNumId node value
+          IEnumerable<XElement> numNodes = numbering.Descendants().Where(s => s.Name.LocalName == "num");
+          foreach (XElement num in numNodes)
+          {
+            XElement abstractNumIdNode = num.Descendants().First(s => s.Name.LocalName == "abstractNumId");
+            if (abstractNumIdNode.Attribute(w + "val").Value.Equals(abstractNumId))
+            {
+              listNumValues.NumId = num.Attribute(w + "numId").Value;
+            }
+          }
+        }
+
+        return listNumValues;
+      }
 
         internal XDocument AddStylesForList()
         {
@@ -1782,12 +1854,6 @@ namespace Novacode
 
           return wordStyles;
         }
-
-
-
-
-
-
 
 
 
@@ -2031,7 +2097,7 @@ namespace Novacode
 
         internal static void PostCreation(ref Package package)
         {
-            XDocument mainDoc, stylesDoc;
+            XDocument mainDoc, stylesDoc, numberingDoc;
 
             #region MainDocumentPart
             // Create the main document part for this package
@@ -2063,6 +2129,10 @@ namespace Novacode
 
             #region StylePart
             stylesDoc = HelperFunctions.AddDefaultStylesXml(package);
+            #endregion
+
+            #region NumberingPart
+            numberingDoc = HelperFunctions.AddDefaultNumberingXml(package);
             #endregion
 
             package.Close();
