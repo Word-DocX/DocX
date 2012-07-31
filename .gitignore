@@ -55,3 +55,4 @@ policy/EventHandlers/rendering_templates/*
 WholeEnchilada.sln
 TestResult.xml
 additional_binds.yml
+TestResults/
