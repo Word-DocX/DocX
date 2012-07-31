@@ -1736,7 +1736,7 @@ namespace Novacode
       {
         var numberingUri = new Uri("/word/numbering.xml", UriKind.Relative);
 
-        var listLevelType = isMultiLevel ? "multilevel" : "hybridMultiLevel";
+        var listLevelType = isMultiLevel ? "multilevel" : "hybridMultilevel";
 
         // If the internal document contains no /word/numbering.xml create one.
         if (!package.PartExists(numberingUri))
