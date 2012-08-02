@@ -1455,19 +1455,97 @@ namespace UnitTests
 
 
         [TestMethod]
-        public void Creating_An_Ordered_List_In_A_Document()
+        public void WhenCreatingAnOrderedListTheListXmlShouldHaveNumberedListItemType()
         {
 
-          using (DocX document = DocX.Create("TestList.docx"))
+          using (DocX document = DocX.Create("TestListXmlNumbered.docx"))
           {
-            document.AddList(1);
+            var list = document.AddList("First Item", 0, ListItemType.Numbered);
 
-            //var lists = document.GetLists();
+            var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
 
-            //Assert.AreEqual(lists.Count, 1);
+            var numId = listNumPropNode.Descendants().First(s => s.Name.LocalName == "numId");
+
+            Assert.AreEqual(numId.Attribute(DocX.w + "val").Value, "2");
           }
 
         }
+
+
+        [TestMethod]
+        public void WhenCreatingAnUnOrderedListTheListXmlShouldHaveBulletListItemType()
+        {
+
+          using (DocX document = DocX.Create("TestListXmlBullet.docx"))
+          {
+           var list = document.AddList("First Item");
+
+            var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
+
+            var numId = listNumPropNode.Descendants().First(s => s.Name.LocalName == "numId");
+
+            Assert.AreEqual(numId.Attribute(DocX.w + "val").Value, "1");
+          }
+        }
+
+
+        [TestMethod]
+        public void WhenCreatingAListWithTextTheListXmlShouldHaveTheCorrectRunItemText()
+        {
+          using (DocX document = DocX.Create("TestListCreate.docx"))
+          {
+            var list = document.AddList("RunText");
+
+            var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
+
+            var runTextNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "t");
+
+            Assert.IsNotNull(listNumPropNode);
+            Assert.AreEqual(list.ListItemText, runTextNode.Value);
+          }
+        }
+
+
+        [TestMethod]
+        public void WhenCreatingAnOrderedListTheListShouldHaveNumberedListItemType()
+        {
+
+          using (DocX document = DocX.Create("TestListCreateOrderedList.docx"))
+          {
+            var list = document.AddList("First Item", 0, ListItemType.Numbered);
+
+            Assert.AreEqual(list.ListItemType, ListItemType.Numbered);
+          }
+
+        }
+
+
+        [TestMethod]
+        public void WhenCreatingAnUnOrderedListTheListShouldHaveBulletListItemType()
+        {
+
+          using (DocX document = DocX.Create("TestListCreateUnorderedList.docx"))
+          {
+            var list = document.AddList("First Item");
+
+            Assert.AreEqual(list.ListItemType, ListItemType.Bulleted);
+          }
+
+        }
+
+
+        [TestMethod]
+        public void WhenCreatingAListWithTextTheListShouldHaveTheCorrectRunItemText()
+        {
+
+          using (DocX document = DocX.Create("TestListCreateRunText.docx"))
+          {
+            var list = document.AddList("RunText");
+
+            Assert.AreEqual(list.ListItemText, "RunText");
+          }
+        }
+
 
         [TestMethod]
         public void WhenCreatingAListTheListStyleShouldExistOrBeCreated()
