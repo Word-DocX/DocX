@@ -1697,32 +1697,27 @@ namespace Novacode
         }
 
 
-      //Todo: add parameter for list type, and perhaps some more params for linking to paragraph style (numId, ilvl values) in numbering.xml - check AddHyperlinkStyleIfNotPresent()
-        public void AddList(int numOfListItems = 1, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
+        public ListItem AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
-
-          if (numOfListItems <= 0)
-            throw new ArgumentOutOfRangeException("Number of items in a list should be atleast 1.");
 
           var listNumValues = GetListNumValues(listType);
 
-          for (int i = 0; i < numOfListItems; i++ )
-          {
-
             var newParagraphSection = new XElement
               (
-              XName.Get("p", DocX.w.NamespaceName),
-              new XElement(XName.Get("pPr", DocX.w.NamespaceName),
-                           new XElement(XName.Get("numPr", DocX.w.NamespaceName),
-                                        new XElement(XName.Get("ilvl", DocX.w.NamespaceName), new XAttribute(w + "val", listNumValues.Ilvl)),
-                                        new XElement(XName.Get("numId", DocX.w.NamespaceName), new XAttribute(w + "val", listNumValues.NumId))))
+              XName.Get("p", w.NamespaceName),
+              new XElement(XName.Get("pPr", w.NamespaceName),
+                           new XElement(XName.Get("numPr", w.NamespaceName),
+                                        new XElement(XName.Get("ilvl", w.NamespaceName), new XAttribute(w + "val", listNumValues.Ilvl)),
+                                        new XElement(XName.Get("numId", w.NamespaceName), new XAttribute(w + "val", listNumValues.NumId)))),
+             new XElement(XName.Get("r", w.NamespaceName), new XElement(XName.Get("t", w.NamespaceName), listText))              
               );
 
             if (trackChanges)
               newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
 
             Xml.Add(newParagraphSection);
-          }
+
+          return new ListItem{Level = level, ListItemText = listText, ListItemType = listType};
 
         }
 
@@ -1736,13 +1731,12 @@ namespace Novacode
       {
         var numberingUri = new Uri("/word/numbering.xml", UriKind.Relative);
 
-        var listLevelType = isMultiLevel ? "multilevel" : "hybridMultiLevel";
+        var listLevelType = isMultiLevel ? "multilevel" : "hybridMultilevel";
 
         // If the internal document contains no /word/numbering.xml create one.
         if (!package.PartExists(numberingUri))
           HelperFunctions.AddDefaultNumberingXml(package);
 
-        // Load numbering.xml into memory.
         XDocument numbering;
         using (TextReader tr = new StreamReader(package.GetPart(numberingUri).GetStream()))
           numbering = XDocument.Load(tr);
@@ -1758,7 +1752,6 @@ namespace Novacode
 
           abstractNumId = abstractNum.Attribute(w + "abstractNumId").Value;
 
-          //search hybrid multilevel only - for single-level list
           if (multiLevelNode.Attribute(w + "val").Value.Equals(listLevelType))
           {
             var lvlNode = abstractNum.Descendants().First(s => s.Name.LocalName == "lvl");
