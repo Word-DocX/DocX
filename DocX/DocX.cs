@@ -1698,7 +1698,7 @@ namespace Novacode
 
 
       //Todo: add parameter for list type, and perhaps some more params for linking to paragraph style (numId, ilvl values) in numbering.xml - check AddHyperlinkStyleIfNotPresent()
-        public void AddList(int numOfListItems = 1, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
+        public void AddList(string listText, int numOfListItems = 1, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
 
           if (numOfListItems <= 0)
@@ -1715,7 +1715,8 @@ namespace Novacode
               new XElement(XName.Get("pPr", DocX.w.NamespaceName),
                            new XElement(XName.Get("numPr", DocX.w.NamespaceName),
                                         new XElement(XName.Get("ilvl", DocX.w.NamespaceName), new XAttribute(w + "val", listNumValues.Ilvl)),
-                                        new XElement(XName.Get("numId", DocX.w.NamespaceName), new XAttribute(w + "val", listNumValues.NumId))))
+                                        new XElement(XName.Get("numId", DocX.w.NamespaceName), new XAttribute(w + "val", listNumValues.NumId)))),
+             new XElement(XName.Get("r", w.NamespaceName), new XElement(XName.Get("t", w.NamespaceName), listText))              
               );
 
             if (trackChanges)
@@ -1742,7 +1743,6 @@ namespace Novacode
         if (!package.PartExists(numberingUri))
           HelperFunctions.AddDefaultNumberingXml(package);
 
-        // Load numbering.xml into memory.
         XDocument numbering;
         using (TextReader tr = new StreamReader(package.GetPart(numberingUri).GetStream()))
           numbering = XDocument.Load(tr);
@@ -1758,7 +1758,6 @@ namespace Novacode
 
           abstractNumId = abstractNum.Attribute(w + "abstractNumId").Value;
 
-          //search hybrid multilevel only - for single-level list
           if (multiLevelNode.Attribute(w + "val").Value.Equals(listLevelType))
           {
             var lvlNode = abstractNum.Descendants().First(s => s.Name.LocalName == "lvl");
