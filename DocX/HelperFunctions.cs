@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO.Packaging;
-using System.Xml.Linq;
-using System.IO;
-using System.Reflection;
-using System.IO.Compression;
-using System.Security.Principal;
 using System.Globalization;
+using System.IO;
+using System.IO.Compression;
+using System.IO.Packaging;
+using System.Linq;
+using System.Reflection;
+using System.Security.Principal;
+using System.Text;
+using System.Xml.Linq;
 
 namespace Novacode
 {
@@ -88,7 +88,6 @@ namespace Novacode
                     // Update text of last entry.
                     last.text += ft.text;
                 }
-
                 else
                 {
                     if (last != null)
@@ -116,7 +115,7 @@ namespace Novacode
 
             // e is a w:r element, lets find the rPr element.
             XElement rPr = e.Element(XName.Get("rPr", DocX.w.NamespaceName));
-            
+
             FormattedText ft = new FormattedText();
             ft.text = text;
             ft.index = 0;
@@ -251,7 +250,6 @@ namespace Novacode
                 using (TextWriter tw = new StreamWriter(settingsPart.GetStream()))
                     settings.Save(tw);
             }
-
             else
                 settingsPart = package.GetPart(settingsUri);
             return settingsPart;
@@ -312,24 +310,24 @@ namespace Novacode
         /// <returns></returns>
         internal static XDocument AddDefaultNumberingXml(Package package)
         {
-          XDocument numberingDoc;
-          // Create the main document part for this package
-          PackagePart wordNumbering = package.CreatePart(new Uri("/word/numbering.xml", UriKind.Relative), "application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml", CompressionOption.Maximum);
+            XDocument numberingDoc;
+            // Create the main document part for this package
+            PackagePart wordNumbering = package.CreatePart(new Uri("/word/numbering.xml", UriKind.Relative), "application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml", CompressionOption.Maximum);
 
-          numberingDoc = HelperFunctions.DecompressXMLResource("Novacode.Resources.numbering.xml.gz");
-          
-          // Save /word/numbering.xml
-          using (TextWriter tw = new StreamWriter(wordNumbering.GetStream(FileMode.Create, FileAccess.Write)))
-            numberingDoc.Save(tw, SaveOptions.None);
+            numberingDoc = DecompressXMLResource("Novacode.Resources.numbering.xml.gz");
 
-          PackagePart mainDocumentPart = package.GetParts().Single(p => p.ContentType.Equals
-                                                                          (
-                                                                            "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
-                                                                            StringComparison.CurrentCultureIgnoreCase
-                                                                          ));
+            // Save /word/numbering.xml
+            using (TextWriter tw = new StreamWriter(wordNumbering.GetStream(FileMode.Create, FileAccess.Write)))
+                numberingDoc.Save(tw, SaveOptions.None);
 
-          mainDocumentPart.CreateRelationship(wordNumbering.Uri, TargetMode.Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering");
-          return numberingDoc;
+            PackagePart mainDocumentPart = package.GetParts().Single(p => p.ContentType.Equals
+                                                                            (
+                                                                              "application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml",
+                                                                              StringComparison.CurrentCultureIgnoreCase
+                                                                            ));
+
+            mainDocumentPart.CreateRelationship(wordNumbering.Uri, TargetMode.Internal, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering");
+            return numberingDoc;
         }
 
 
@@ -349,7 +347,7 @@ namespace Novacode
             stylesDoc = HelperFunctions.DecompressXMLResource("Novacode.Resources.default_styles.xml.gz");
             XElement lang = stylesDoc.Root.Element(XName.Get("docDefaults", DocX.w.NamespaceName)).Element(XName.Get("rPrDefault", DocX.w.NamespaceName)).Element(XName.Get("rPr", DocX.w.NamespaceName)).Element(XName.Get("lang", DocX.w.NamespaceName));
             lang.SetAttributeValue(XName.Get("val", DocX.w.NamespaceName), CultureInfo.CurrentCulture);
-            
+
             // Save /word/styles.xml
             using (TextWriter tw = new StreamWriter(word_styles.GetStream(FileMode.Create, FileAccess.Write)))
                 stylesDoc.Save(tw, SaveOptions.None);
@@ -544,7 +542,6 @@ namespace Novacode
                 before = new XElement(p.Xml.Name, p.Xml.Attributes(), r.Xml.Parent.ElementsBeforeSelf(), split[0]);
                 after = new XElement(p.Xml.Name, p.Xml.Attributes(), r.Xml.Parent.ElementsAfterSelf(), split[1]);
             }
-
             else if (r.Xml.Parent.Name.LocalName == "del")
             {
                 split = p.SplitEdit(r.Xml.Parent, index, EditType.del);
@@ -552,7 +549,6 @@ namespace Novacode
                 before = new XElement(p.Xml.Name, p.Xml.Attributes(), r.Xml.Parent.ElementsBeforeSelf(), split[0]);
                 after = new XElement(p.Xml.Name, p.Xml.Attributes(), r.Xml.Parent.ElementsAfterSelf(), split[1]);
             }
-
             else
             {
                 split = Run.SplitRun(r, index);

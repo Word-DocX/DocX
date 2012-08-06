@@ -562,13 +562,11 @@ namespace Novacode
           case "bullet":
             listItemType = ListItemType.Bulleted;
             break;
-          case "decimal":
+          default:
             listItemType = ListItemType.Numbered;
             break;
-          default:
-            listItemType = ListItemType.None;
-            break;
         }
+
         return listItemType;
       }
 

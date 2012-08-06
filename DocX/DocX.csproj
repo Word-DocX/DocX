@@ -147,6 +147,10 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\numbering.xml.gz" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\numbering.default_bullet_abstract.xml.gz" />
+    <EmbeddedResource Include="Resources\numbering.default_decimal_abstract.xml.gz" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

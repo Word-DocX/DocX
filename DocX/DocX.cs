@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
-using System.Xml;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.IO.Packaging;
+using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Novacode
 {
@@ -28,6 +28,8 @@ namespace Novacode
         static internal XNamespace wp = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
         static internal XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
         static internal XNamespace c = "http://schemas.openxmlformats.org/drawingml/2006/chart";
+
+        internal static XNamespace n = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering";
         #endregion
 
         internal float getMarginAttribute(XName name)
@@ -74,7 +76,7 @@ namespace Novacode
         {
             get
             {
-               return getMarginAttribute(XName.Get("top", DocX.w.NamespaceName));
+                return getMarginAttribute(XName.Get("top", DocX.w.NamespaceName));
             }
 
             set
@@ -207,7 +209,7 @@ namespace Novacode
 
                         if (pgSz != null)
                         {
-                            pgSz.SetAttributeValue(XName.Get("h", DocX.w.NamespaceName), value*15);
+                            pgSz.SetAttributeValue(XName.Get("h", DocX.w.NamespaceName), value * 15);
                         }
                     }
                 }
@@ -486,7 +488,6 @@ namespace Novacode
                     if (value)
                         settings.Root.AddFirst(new XElement(w + "evenAndOddHeaders"));
                 }
-
                 else
                 {
                     if (!value)
@@ -556,7 +557,6 @@ namespace Novacode
                     if (value)
                         sectPr.Add(new XElement(w + "titlePg", string.Empty));
                 }
-
                 else
                 {
                     if (!value)
@@ -628,36 +628,36 @@ namespace Novacode
         public List<Section> GetSections()
         {
 
-          var allParas = Paragraphs;
+            var allParas = Paragraphs;
 
-          var parasInASection = new List<Paragraph>();
-          var sections = new List<Section>();
-            
-          foreach (var para in allParas)
+            var parasInASection = new List<Paragraph>();
+            var sections = new List<Section>();
+
+            foreach (var para in allParas)
             {
-              
-              var sectionInPara = para.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "sectPr");
 
-               if (sectionInPara == null)
-               {
-                 parasInASection.Add(para);
-               }
-               else
-               {
-                 parasInASection.Add(para);
-                 var section = new Section(Document, sectionInPara) {SectionParagraphs = parasInASection};
-                 sections.Add(section);
-                 parasInASection = new List<Paragraph>();
-               }
+                var sectionInPara = para.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "sectPr");
 
-             }
+                if (sectionInPara == null)
+                {
+                    parasInASection.Add(para);
+                }
+                else
+                {
+                    parasInASection.Add(para);
+                    var section = new Section(Document, sectionInPara) { SectionParagraphs = parasInASection };
+                    sections.Add(section);
+                    parasInASection = new List<Paragraph>();
+                }
 
-          XElement body = mainDoc.Root.Element(XName.Get("body", DocX.w.NamespaceName));
-          XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
-          var baseSection = new Section(Document, baseSectionXml) { SectionParagraphs = parasInASection };
-          sections.Add(baseSection);
+            }
 
-          return sections;
+            XElement body = mainDoc.Root.Element(XName.Get("body", DocX.w.NamespaceName));
+            XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
+            var baseSection = new Section(Document, baseSectionXml) { SectionParagraphs = parasInASection };
+            sections.Add(baseSection);
+
+            return sections;
         }
 
         // Get the word\document.xml part
@@ -949,8 +949,8 @@ namespace Novacode
             // We don't want to effect the origional XDocument, so create a new one from the old one.
             XDocument remote_mainDoc = new XDocument(remote_document.mainDoc);
 
-            XDocument remote_footnotes = null ;
-            if(remote_document.footnotes != null)
+            XDocument remote_footnotes = null;
+            if (remote_document.footnotes != null)
                 remote_footnotes = new XDocument(remote_document.footnotes);
 
             XDocument remote_endnotes = null;
@@ -976,7 +976,7 @@ namespace Novacode
                 "application/vnd.openxmlformats-officedocument.extended-properties+xml",
                 "application/vnd.openxmlformats-package.relationships+xml",
             };
-            
+
             List<String> imageContentTypes = new List<string>
             {
                 "image/jpeg",
@@ -1049,7 +1049,7 @@ namespace Novacode
                             footnotesPart = packagePart;
                             footnotes = remote_footnotes;
                             break;
-                        
+
                         case "application/vnd.openxmlformats-officedocument.custom-properties+xml":
                             break;
 
@@ -1155,7 +1155,7 @@ namespace Novacode
             String remote_hash = ComputeMD5HashString(remote_pp.GetStream());
             var image_parts = package.GetParts().Where(pp => pp.ContentType.Equals(contentType));
 
-            bool found = false; 
+            bool found = false;
             foreach (var part in image_parts)
             {
                 String local_hash = ComputeMD5HashString(part.GetStream());
@@ -1342,7 +1342,7 @@ namespace Novacode
                     XAttribute remote_property_name = remote_property.Attribute(XName.Get("name"));
                     XAttribute local_property_name = local_property.Attribute(XName.Get("name"));
 
-                    if(remote_property != null && local_property_name != null && remote_property_name.Value.Equals(local_property_name.Value))
+                    if (remote_property != null && local_property_name != null && remote_property_name.Value.Equals(local_property_name.Value))
                         found = true;
                 }
 
@@ -1368,7 +1368,7 @@ namespace Novacode
             foreach (var an in remote_abstractNums)
             {
                 XAttribute a = an.Attribute(XName.Get("abstractNumId", DocX.w.NamespaceName));
-                if(a != null)
+                if (a != null)
                 {
                     int i;
                     if (int.TryParse(a.Value, out i))
@@ -1455,7 +1455,7 @@ namespace Novacode
                         break;
                     }
                 }
-                
+
                 if (flag_addFont)
                 {
                     fontTable.Root.Add(remote_font);
@@ -1473,7 +1473,7 @@ namespace Novacode
                 String value = styleId.Value;
                 styleId.Remove();
                 String key = Regex.Replace(temp.ToString(), @"\s+", "");
-                if (!local_styles.ContainsKey(key)) local_styles.Add(key, value); 
+                if (!local_styles.ContainsKey(key)) local_styles.Add(key, value);
             }
 
             // Add each remote style to this document.
@@ -1503,11 +1503,10 @@ namespace Novacode
                         guuid = local_value;
                     }
                 }
-
                 else
                     guuid = Guid.NewGuid().ToString();
 
-                foreach(XElement e in remote_mainDoc.Root.Descendants(XName.Get("pStyle", DocX.w.NamespaceName)))
+                foreach (XElement e in remote_mainDoc.Root.Descendants(XName.Get("pStyle", DocX.w.NamespaceName)))
                 {
                     XAttribute e_styleId = e.Attribute(XName.Get("val", DocX.w.NamespaceName));
                     if (e_styleId != null && e_styleId.Value.Equals(styleId.Value))
@@ -1525,7 +1524,7 @@ namespace Novacode
                     }
                 }
 
-                foreach(XElement e in remote_mainDoc.Root.Descendants(XName.Get("tblStyle", DocX.w.NamespaceName)))
+                foreach (XElement e in remote_mainDoc.Root.Descendants(XName.Get("tblStyle", DocX.w.NamespaceName)))
                 {
                     XAttribute e_styleId = e.Attribute(XName.Get("val", DocX.w.NamespaceName));
                     if (e_styleId != null && e_styleId.Value.Equals(styleId.Value))
@@ -1578,7 +1577,7 @@ namespace Novacode
 
                 // Make sure they don't clash by using a uuid.
                 styleId.SetValue(guuid);
-                styles.Root.Add(remote_style);  
+                styles.Root.Add(remote_style);
             }
         }
 
@@ -1595,7 +1594,7 @@ namespace Novacode
 
                     // Replace all instances of remote_Id in the local document with local_Id
                     var elems = remote_mainDoc.Descendants(XName.Get("blip", DocX.a.NamespaceName));
-                    foreach(var elem in elems)
+                    foreach (var elem in elems)
                     {
                         XAttribute embed = elem.Attribute(XName.Get("embed", DocX.r.NamespaceName));
                         if (embed != null && embed.Value == remote_Id)
@@ -1700,147 +1699,188 @@ namespace Novacode
         public ListItem AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
 
-          var listNumValues = GetListNumValues(listType);
+            var numId = CreateNewNumberingNumId(level, listType);
 
             var newParagraphSection = new XElement
               (
               XName.Get("p", w.NamespaceName),
               new XElement(XName.Get("pPr", w.NamespaceName),
                            new XElement(XName.Get("numPr", w.NamespaceName),
-                                        new XElement(XName.Get("ilvl", w.NamespaceName), new XAttribute(w + "val", listNumValues.Ilvl)),
-                                        new XElement(XName.Get("numId", w.NamespaceName), new XAttribute(w + "val", listNumValues.NumId)))),
-             new XElement(XName.Get("r", w.NamespaceName), new XElement(XName.Get("t", w.NamespaceName), listText))              
+                                        new XElement(XName.Get("ilvl", w.NamespaceName), new XAttribute(w + "val", level)),
+                                        new XElement(XName.Get("numId", w.NamespaceName), new XAttribute(w + "val", numId)))),
+             new XElement(XName.Get("r", w.NamespaceName), new XElement(XName.Get("t", w.NamespaceName), listText))
               );
 
             if (trackChanges)
-              newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+                newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
 
             Xml.Add(newParagraphSection);
 
-          return new ListItem{Level = level, ListItemText = listText, ListItemType = listType};
+            return new ListItem { Level = level, ListItemText = listText, ListItemType = listType };
 
         }
 
-      public class ListNumValues
-      {
-       public string NumId { get; set; }
-       public string Ilvl { get; set; }
-      }
-
-      public ListNumValues GetListNumValues(ListItemType listItemType, bool isMultiLevel = false)
-      {
-        var numberingUri = new Uri("/word/numbering.xml", UriKind.Relative);
-
-        var listLevelType = isMultiLevel ? "multilevel" : "hybridMultilevel";
-
-        // If the internal document contains no /word/numbering.xml create one.
-        if (!package.PartExists(numberingUri))
-          HelperFunctions.AddDefaultNumberingXml(package);
-
-        XDocument numbering;
-        using (TextReader tr = new StreamReader(package.GetPart(numberingUri).GetStream()))
-          numbering = XDocument.Load(tr);
-
-        IEnumerable<XElement> abstractNums = numbering.Descendants().Where(s => s.Name.LocalName == "abstractNum");
-        string abstractNumId = null;
-
-        var listNumValues = new ListNumValues();
-
-        foreach (XElement abstractNum in abstractNums)
+        internal int CreateNewNumberingNumId(int level = 0, ListItemType listType = ListItemType.Bulleted)
         {
-          XElement multiLevelNode = abstractNum.Descendants().First(s => s.Name.LocalName == "multiLevelType");
-
-          abstractNumId = abstractNum.Attribute(w + "abstractNumId").Value;
-
-          if (multiLevelNode.Attribute(w + "val").Value.Equals(listLevelType))
-          {
-            var lvlNode = abstractNum.Descendants().First(s => s.Name.LocalName == "lvl");
-
-            var numFmtNode = lvlNode.Descendants().First(s => s.Name.LocalName == "numFmt");
-
-            var numFmtVal = numFmtNode.Attribute(w + "val").Value;
-
-            if ((listItemType == ListItemType.Numbered) && numFmtVal.Equals("decimal"))
+            ValidateDocXNumberingPartExists();
+            if (numbering.Root == null)
             {
-              listNumValues.Ilvl = lvlNode.Attribute(w + "ilvl").Value;
-              break;
+                throw new InvalidOperationException("Numbering section did not instantiate properly.");
             }
-            if ((listItemType == ListItemType.Bulleted) && numFmtVal.Equals("bullet"))
+
+            var numId = GetMaxNumId() + 1;
+            var abstractNumId = GetMaxAbstractNumId() + 1;
+
+            XDocument listTemplate;
+            switch (listType)
             {
-              listNumValues.Ilvl = lvlNode.Attribute(w + "ilvl").Value;
-              break;
+                case ListItemType.Bulleted:
+                    listTemplate = HelperFunctions.DecompressXMLResource("Novacode.Resources.numbering.default_bullet_abstract.xml.gz");
+                    break;
+                case ListItemType.Numbered:
+                    listTemplate = HelperFunctions.DecompressXMLResource("Novacode.Resources.numbering.default_decimal_abstract.xml.gz");
+                    break;
+                default:
+                    throw new InvalidOperationException(string.Format("Unable to deal with ListItemType: {0}.", listType.ToString()));
             }
-          }
+            var abstractNumTemplate = listTemplate.Descendants().Single(d => d.Name.LocalName == "abstractNum");
+            abstractNumTemplate.SetAttributeValue(w + "abstractNumId", abstractNumId);
+
+
+            numbering.Root.Add(abstractNumTemplate);
+            numbering.Root.Add(
+                new XElement(
+                    XName.Get("num", w.NamespaceName),
+                    new XAttribute(w + "numId", numId),
+                    new XElement(XName.Get("abstractNumId", w.NamespaceName),
+                                    new XAttribute(w + "val", abstractNumId))
+                )
+            );
+
+            return numId;
         }
 
-        if (!String.IsNullOrEmpty(listNumValues.Ilvl))
+        /// <summary>
+        /// Method to determine the last numId for a list element. 
+        /// Also useful for determining the next numId to use for inserting a new list element into the document.
+        /// </summary>
+        /// <returns>
+        /// 0 if there are no elements in the list already.
+        /// Increment the return for the next valid value of a new list element.
+        /// </returns>
+        public int GetMaxNumId()
         {
-          //find num node with abstractNumId node value
-          IEnumerable<XElement> numNodes = numbering.Descendants().Where(s => s.Name.LocalName == "num");
-          foreach (XElement num in numNodes)
-          {
-            XElement abstractNumIdNode = num.Descendants().First(s => s.Name.LocalName == "abstractNumId");
-            if (abstractNumIdNode.Attribute(w + "val").Value.Equals(abstractNumId))
-            {
-              listNumValues.NumId = num.Attribute(w + "numId").Value;
-            }
-          }
+            const int defaultValue = 0;
+            if (numbering == null)
+                return defaultValue;
+
+            var numlist = numbering.Descendants().Where(d => d.Name.LocalName == "num").ToList();
+            if (numlist.Any())
+                return numlist.Max(e => int.Parse(e.Value));
+            return defaultValue;
         }
 
-        return listNumValues;
-      }
+        /// <summary>
+        /// Method to determine the last abstractNumId for a list element.
+        /// Also useful for determining the next abstractNumId to use for inserting a new list element into the document.
+        /// </summary>
+        /// <returns>
+        /// -1 if there are no elements in the list already.
+        /// Increment the return for the next valid value of a new list element.
+        /// </returns>
+        public int GetMaxAbstractNumId()
+        {
+            const int defaultValue = -1;
+
+            if (numbering == null)
+                return defaultValue;
+
+            var numlist = numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum").ToList();
+            if (numlist.Any())
+                return numlist.Max(e => int.Parse(e.Value));
+            return defaultValue;
+        }
+
+        /// <summary>
+        /// Get the abstractNum definition for the given numId
+        /// </summary>
+        /// <param name="numId">The numId on the pPr element</param>
+        /// <returns>XElement representing the requested abstractNum</returns>
+        public XElement GetAbstractNum(int numId)
+        {
+            var num = numbering.Descendants().First(d => d.Name.LocalName == "num" && d.GetAttribute(w + "numId").Equals(numId.ToString()));
+            var abstractNumId = num.Descendants().First(d => d.Name.LocalName == "abstractNumId");
+            return numbering.Descendants().First(d => d.Name.LocalName == "abstractNum" && d.GetAttribute("abstractNumId").Equals(abstractNumId.Value));
+        }
+
+        private void ValidateDocXNumberingPartExists()
+        {
+            var numberingUri = new Uri("/word/numbering.xml", UriKind.Relative);
+
+            //var listLevelType = isMultiLevel ? "multilevel" : "hybridMultilevel";
+
+            // If the internal document contains no /word/numbering.xml create one.
+            if (!package.PartExists(numberingUri))
+                HelperFunctions.AddDefaultNumberingXml(package);
+
+            //XDocument numbering;
+            using (TextReader tr = new StreamReader(package.GetPart(numberingUri).GetStream()))
+            {
+                numbering = XDocument.Load(tr);
+            }
+        }
 
         internal XDocument AddStylesForList()
         {
-          var wordStylesUri = new Uri("/word/styles.xml", UriKind.Relative);
+            var wordStylesUri = new Uri("/word/styles.xml", UriKind.Relative);
 
-          // If the internal document contains no /word/styles.xml create one.
-          if (!package.PartExists(wordStylesUri))
-            HelperFunctions.AddDefaultStylesXml(package);
+            // If the internal document contains no /word/styles.xml create one.
+            if (!package.PartExists(wordStylesUri))
+                HelperFunctions.AddDefaultStylesXml(package);
 
-          // Load the styles.xml into memory.
-          XDocument wordStyles;
-          using (TextReader tr = new StreamReader(package.GetPart(wordStylesUri).GetStream()))
-            wordStyles = XDocument.Load(tr);
+            // Load the styles.xml into memory.
+            XDocument wordStyles;
+            using (TextReader tr = new StreamReader(package.GetPart(wordStylesUri).GetStream()))
+                wordStyles = XDocument.Load(tr);
 
-          bool listStyleExists =
-          (
-            from s in wordStyles.Element(w + "styles").Elements()
-            let styleId = s.Attribute(XName.Get("styleId", w.NamespaceName))
-            where (styleId != null && styleId.Value == "ListParagraph")
-            select s
-          ).Any();
-
-          if (!listStyleExists)
-          {
-            var style = new XElement
+            bool listStyleExists =
             (
-                w + "style",
-                new XAttribute(w + "type", "paragraph"),
-                new XAttribute(w + "styleId", "ListParagraph"),
-                    new XElement(w + "name", new XAttribute(w + "val", "List Paragraph")),
-                    new XElement(w + "basedOn", new XAttribute(w + "val", "Normal")),
-                    new XElement(w + "uiPriority", new XAttribute(w + "val", "34")),
-                    new XElement(w + "qformat"),
-                    new XElement(w + "rsid", new XAttribute(w + "val", "00832EE1")),
-                    new XElement
-                    (
-                        w + "rPr",
-                        new XElement(w + "ind", new XAttribute(w + "left", "720")),
+              from s in wordStyles.Element(w + "styles").Elements()
+              let styleId = s.Attribute(XName.Get("styleId", w.NamespaceName))
+              where (styleId != null && styleId.Value == "ListParagraph")
+              select s
+            ).Any();
+
+            if (!listStyleExists)
+            {
+                var style = new XElement
+                (
+                    w + "style",
+                    new XAttribute(w + "type", "paragraph"),
+                    new XAttribute(w + "styleId", "ListParagraph"),
+                        new XElement(w + "name", new XAttribute(w + "val", "List Paragraph")),
+                        new XElement(w + "basedOn", new XAttribute(w + "val", "Normal")),
+                        new XElement(w + "uiPriority", new XAttribute(w + "val", "34")),
+                        new XElement(w + "qformat"),
+                        new XElement(w + "rsid", new XAttribute(w + "val", "00832EE1")),
                         new XElement
                         (
-                            w + "contextualSpacing"
+                            w + "rPr",
+                            new XElement(w + "ind", new XAttribute(w + "left", "720")),
+                            new XElement
+                            (
+                                w + "contextualSpacing"
+                            )
                         )
-                    )
-            );
-            wordStyles.Element(w + "styles").Add(style);
+                );
+                wordStyles.Element(w + "styles").Add(style);
 
-            // Save the styles document.
-            using (TextWriter tw = new StreamWriter(package.GetPart(wordStylesUri).GetStream()))
-              wordStyles.Save(tw);
-          }
+                // Save the styles document.
+                using (TextWriter tw = new StreamWriter(package.GetPart(wordStylesUri).GetStream()))
+                    wordStyles.Save(tw);
+            }
 
-          return wordStyles;
+            return wordStyles;
         }
 
 
@@ -2224,21 +2264,21 @@ namespace Novacode
             var ps = package.GetParts();
 
             //document.endnotesPart = HelperFunctions.GetPart();
-            
-foreach (var rel in document.mainPart.GetRelationships())
+
+            foreach (var rel in document.mainPart.GetRelationships())
             {
                 switch (rel.RelationshipType)
                 {
                     case "http://schemas.openxmlformats.org/officeDocument/2006/relationships/endnotes":
                         document.endnotesPart = package.GetPart(new Uri("/word/" + rel.TargetUri.OriginalString.Replace("/word/", ""), UriKind.RelativeOrAbsolute));
                         using (TextReader tr = new StreamReader(document.endnotesPart.GetStream()))
-                            document.endnotes= XDocument.Load(tr);
+                            document.endnotes = XDocument.Load(tr);
                         break;
 
                     case "http://schemas.openxmlformats.org/officeDocument/2006/relationships/footnotes":
                         document.footnotesPart = package.GetPart(new Uri("/word/" + rel.TargetUri.OriginalString.Replace("/word/", ""), UriKind.RelativeOrAbsolute));
                         using (TextReader tr = new StreamReader(document.footnotesPart.GetStream()))
-                            document.footnotes= XDocument.Load(tr);
+                            document.footnotes = XDocument.Load(tr);
                         break;
 
                     case "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles":
@@ -3297,7 +3337,7 @@ foreach (var rel in document.mainPart.GetRelationships())
 
             // Close the document so that it can be saved.
             package.Flush();
-            
+
             #region Save this document back to a file or stream, that was specified by the user at save time.
             if (filename != null)
             {
@@ -3306,8 +3346,6 @@ foreach (var rel in document.mainPart.GetRelationships())
                     fs.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
                 }
             }
-
-
             else
             {
                 // Set the length of this stream to 0
@@ -3757,7 +3795,7 @@ foreach (var rel in document.mainPart.GetRelationships())
                         }
                     }
                 }
-            #endregion
+                #endregion
 
                 #region < Word 2010
                 foreach (XElement e in doc.Descendants(XName.Get("fldSimple", w.NamespaceName)))

@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Text;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Novacode;
-using System.Reflection;
-using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Xml.Linq;
-using System.IO.Packaging;
-using System.Text.RegularExpressions;
 
 namespace UnitTests
 {
@@ -36,7 +32,7 @@ namespace UnitTests
             steps.RemoveRange(steps.Count() - 3, 3);
             directory_documents = String.Join("\\", steps) + "\\documents\\";
 
-          directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
+            //directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
         }
 
         [TestMethod]
@@ -622,7 +618,7 @@ namespace UnitTests
                 Assert.IsTrue(document.Headers.first.Hyperlinks.Count == 1);
                 Assert.IsTrue(document.Headers.first.Hyperlinks[0].Text == "header-first");
                 Assert.IsTrue(document.Headers.first.Hyperlinks[0].Uri.AbsoluteUri == "http://www.header-first.com/");
-                
+
                 // Change the Hyperlinks and check that it has in fact changed.
                 document.Headers.first.Hyperlinks[0].Text = "somethingnew";
                 document.Headers.first.Hyperlinks[0].Uri = new Uri("http://www.google.com/");
@@ -1279,27 +1275,27 @@ namespace UnitTests
         [TestMethod]
         public void Test_ParentContainer_When_Creating_Doc()
         {
-          using (DocX document = DocX.Create("Test.docx"))
-          {
-            document.AddHeaders();
-            Paragraph p1 = document.Headers.first.InsertParagraph("Test");
+            using (DocX document = DocX.Create("Test.docx"))
+            {
+                document.AddHeaders();
+                Paragraph p1 = document.Headers.first.InsertParagraph("Test");
 
-            Assert.IsTrue(p1.ParentContainer == ContainerType.Header);
-          }
+                Assert.IsTrue(p1.ParentContainer == ContainerType.Header);
+            }
         }
 
         [TestMethod]
         public void Test_Section_Count_When_Creating_Doc()
         {
-          //This adds a section break - so insert paragraphs, and follow it up by a section break/paragraph
-          using (DocX document = DocX.Create("TestSectionCount.docx"))
-          {
-            document.InsertSection();
-            
-            var sections = document.GetSections();
+            //This adds a section break - so insert paragraphs, and follow it up by a section break/paragraph
+            using (DocX document = DocX.Create("TestSectionCount.docx"))
+            {
+                document.InsertSection();
 
-            Assert.AreEqual(sections.Count(), 2);
-          }
+                var sections = document.GetSections();
+
+                Assert.AreEqual(sections.Count(), 2);
+            }
 
         }
 
@@ -1307,47 +1303,47 @@ namespace UnitTests
         [TestMethod]
         public void Test_Sections_And_Paragraphs_When_Creating_Doc()
         {
-          //This adds a section break - so insert paragraphs, and follow it up by a section break/paragraph
-          using (DocX document = DocX.Create("TestSectionAndParagraph.docx"))
-          {
-            //Add 2 paras and a break
-            document.InsertParagraph("First Para");
-            document.InsertParagraph("Second Para");
-            document.InsertSection();
-            document.InsertParagraph("This is default para");
+            //This adds a section break - so insert paragraphs, and follow it up by a section break/paragraph
+            using (DocX document = DocX.Create("TestSectionAndParagraph.docx"))
+            {
+                //Add 2 paras and a break
+                document.InsertParagraph("First Para");
+                document.InsertParagraph("Second Para");
+                document.InsertSection();
+                document.InsertParagraph("This is default para");
 
-            var sections = document.GetSections();
+                var sections = document.GetSections();
 
-            Assert.AreEqual(sections.Count(), 2);
-          }
+                Assert.AreEqual(sections.Count(), 2);
+            }
 
-         
+
         }
 
 
         [TestMethod]
         public void Test_ParentContainer_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load(directory_documents + "Tables.docx"))
-          {
-            List<Paragraph> paragraphs = document.Paragraphs;
+            using (DocX document = DocX.Load(directory_documents + "Tables.docx"))
+            {
+                List<Paragraph> paragraphs = document.Paragraphs;
 
-            Paragraph p1 = paragraphs[0];
+                Paragraph p1 = paragraphs[0];
 
-            Assert.IsTrue(p1.ParentContainer == ContainerType.Cell);
-          }
+                Assert.IsTrue(p1.ParentContainer == ContainerType.Cell);
+            }
 
         }
 
         [TestMethod]
         public void Test_Section_Count_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaks.docx"))
-          {
-            var sections = document.GetSections();
+            using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaks.docx"))
+            {
+                var sections = document.GetSections();
 
-            Assert.AreEqual(sections.Count(), 4);
-          }
+                Assert.AreEqual(sections.Count(), 4);
+            }
 
         }
 
@@ -1355,16 +1351,16 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Paragraph_Count_Match_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaksMultiParagraph.docx"))
-          {
+            using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaksMultiParagraph.docx"))
+            {
 
-            var sections = document.GetSections();
+                var sections = document.GetSections();
 
-            Assert.AreEqual(sections[0].SectionParagraphs.Count, 2);
-            Assert.AreEqual(sections[1].SectionParagraphs.Count, 1);
-            Assert.AreEqual(sections[2].SectionParagraphs.Count, 2);
-            Assert.AreEqual(sections[3].SectionParagraphs.Count, 1);
-          }
+                Assert.AreEqual(sections[0].SectionParagraphs.Count, 2);
+                Assert.AreEqual(sections[1].SectionParagraphs.Count, 1);
+                Assert.AreEqual(sections[2].SectionParagraphs.Count, 2);
+                Assert.AreEqual(sections[3].SectionParagraphs.Count, 1);
+            }
         }
 
 
@@ -1372,17 +1368,17 @@ namespace UnitTests
         [TestMethod]
         public void Test_Section_Paragraph_Content_Match_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaks.docx"))
-          {
-            
-            var sections = document.GetSections();
+            using (DocX document = DocX.Load(directory_documents + "testdoc_SectionsWithSectionBreaks.docx"))
+            {
 
-            Assert.IsTrue(sections[0].SectionParagraphs[0].Text.Contains("Section 1"));
-            Assert.IsTrue(sections[1].SectionParagraphs[0].Text.Contains("Section 2"));
-            Assert.IsTrue(sections[2].SectionParagraphs[0].Text.Contains("Section 3"));
-            Assert.IsTrue(sections[3].SectionParagraphs[0].Text.Contains("Section 4"));
+                var sections = document.GetSections();
 
-          }
+                Assert.IsTrue(sections[0].SectionParagraphs[0].Text.Contains("Section 1"));
+                Assert.IsTrue(sections[1].SectionParagraphs[0].Text.Contains("Section 2"));
+                Assert.IsTrue(sections[2].SectionParagraphs[0].Text.Contains("Section 3"));
+                Assert.IsTrue(sections[3].SectionParagraphs[0].Text.Contains("Section 4"));
+
+            }
         }
 
 
@@ -1390,19 +1386,19 @@ namespace UnitTests
         [TestMethod]
         public void Test_Ordered_List_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedList.docx"))
-          {
+            using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedList.docx"))
+            {
 
-            var sections = document.GetSections();
+                var sections = document.GetSections();
 
-            Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
 
-            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Numbered);
-            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Numbered);
-            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Numbered);
-          }
+                Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Numbered);
+                Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Numbered);
+                Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Numbered);
+            }
         }
 
 
@@ -1410,47 +1406,47 @@ namespace UnitTests
         [TestMethod]
         public void Test_Unordered_List_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load(directory_documents + "testdoc_UnorderedList.docx"))
-          {
+            using (DocX document = DocX.Load(directory_documents + "testdoc_UnorderedList.docx"))
+            {
 
-            var sections = document.GetSections();
+                var sections = document.GetSections();
 
-            Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
 
-            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Bulleted);
-            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Bulleted);
-            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Bulleted);
-          }
+                Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Bulleted);
+                Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Bulleted);
+                Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Bulleted);
+            }
         }
 
 
         [TestMethod]
         public void Test_Ordered_Unordered_Lists_When_Reading_Doc()
         {
-          using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedUnorderedLists.docx"))
-          {
+            using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedUnorderedLists.docx"))
+            {
 
-            var sections = document.GetSections();
+                var sections = document.GetSections();
 
-            Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[0].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[1].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[2].IsListItem);
 
-            Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Numbered);
-            Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Numbered);
-            Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Numbered);
+                Assert.AreEqual(sections[0].SectionParagraphs[0].ListItemType, ListItemType.Numbered);
+                Assert.AreEqual(sections[0].SectionParagraphs[1].ListItemType, ListItemType.Numbered);
+                Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Numbered);
 
-            Assert.IsTrue(sections[0].SectionParagraphs[3].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[4].IsListItem);
-            Assert.IsTrue(sections[0].SectionParagraphs[5].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[3].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[4].IsListItem);
+                Assert.IsTrue(sections[0].SectionParagraphs[5].IsListItem);
 
-            Assert.AreEqual(sections[0].SectionParagraphs[3].ListItemType, ListItemType.Bulleted);
-            Assert.AreEqual(sections[0].SectionParagraphs[4].ListItemType, ListItemType.Bulleted);
-            Assert.AreEqual(sections[0].SectionParagraphs[5].ListItemType, ListItemType.Bulleted);
+                Assert.AreEqual(sections[0].SectionParagraphs[3].ListItemType, ListItemType.Bulleted);
+                Assert.AreEqual(sections[0].SectionParagraphs[4].ListItemType, ListItemType.Bulleted);
+                Assert.AreEqual(sections[0].SectionParagraphs[5].ListItemType, ListItemType.Bulleted);
 
-          }
+            }
         }
 
 
@@ -1458,16 +1454,21 @@ namespace UnitTests
         public void WhenCreatingAnOrderedListTheListXmlShouldHaveNumberedListItemType()
         {
 
-          using (DocX document = DocX.Create("TestListXmlNumbered.docx"))
-          {
-            var list = document.AddList("First Item", 0, ListItemType.Numbered);
+            using (DocX document = DocX.Create("TestListXmlNumbered.docx"))
+            {
+                var level = 0;
+                XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+                document.AddList("First Item", level, ListItemType.Numbered);
 
-            var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
+                var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
 
-            var numId = listNumPropNode.Descendants().First(s => s.Name.LocalName == "numId");
+                var numId = listNumPropNode.Descendants().First(s => s.Name.LocalName == "numId");
+                var abstractNum = document.GetAbstractNum(int.Parse(numId.GetAttribute(w + "val")));
+                var lvl = abstractNum.Descendants().First(d => d.Name.LocalName == "lvl" && d.GetAttribute(w + "ilvl").Equals(level.ToString()));
+                var numFormat = lvl.Descendants().First(d => d.Name.LocalName == "numFmt");
 
-            Assert.AreEqual(numId.Attribute(DocX.w + "val").Value, "2");
-          }
+                Assert.AreEqual(numFormat.GetAttribute(w + "val").ToLower(), "decimal");
+            }
 
         }
 
@@ -1476,33 +1477,33 @@ namespace UnitTests
         public void WhenCreatingAnUnOrderedListTheListXmlShouldHaveBulletListItemType()
         {
 
-          using (DocX document = DocX.Create("TestListXmlBullet.docx"))
-          {
-           var list = document.AddList("First Item");
+            using (DocX document = DocX.Create("TestListXmlBullet.docx"))
+            {
+                var list = document.AddList("First Item");
 
-            var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
+                var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
 
-            var numId = listNumPropNode.Descendants().First(s => s.Name.LocalName == "numId");
+                var numId = listNumPropNode.Descendants().First(s => s.Name.LocalName == "numId");
 
-            Assert.AreEqual(numId.Attribute(DocX.w + "val").Value, "1");
-          }
+                Assert.AreEqual(numId.Attribute(DocX.w + "val").Value, "1");
+            }
         }
 
 
         [TestMethod]
         public void WhenCreatingAListWithTextTheListXmlShouldHaveTheCorrectRunItemText()
         {
-          using (DocX document = DocX.Create("TestListCreate.docx"))
-          {
-            var list = document.AddList("RunText");
+            using (DocX document = DocX.Create("TestListCreate.docx"))
+            {
+                var list = document.AddList("RunText");
 
-            var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
+                var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
 
-            var runTextNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "t");
+                var runTextNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "t");
 
-            Assert.IsNotNull(listNumPropNode);
-            Assert.AreEqual(list.ListItemText, runTextNode.Value);
-          }
+                Assert.IsNotNull(listNumPropNode);
+                Assert.AreEqual(list.ListItemText, runTextNode.Value);
+            }
         }
 
 
@@ -1510,12 +1511,12 @@ namespace UnitTests
         public void WhenCreatingAnOrderedListTheListShouldHaveNumberedListItemType()
         {
 
-          using (DocX document = DocX.Create("TestListCreateOrderedList.docx"))
-          {
-            var list = document.AddList("First Item", 0, ListItemType.Numbered);
+            using (DocX document = DocX.Create("TestListCreateOrderedList.docx"))
+            {
+                var list = document.AddList("First Item", 0, ListItemType.Numbered);
 
-            Assert.AreEqual(list.ListItemType, ListItemType.Numbered);
-          }
+                Assert.AreEqual(list.ListItemType, ListItemType.Numbered);
+            }
 
         }
 
@@ -1524,12 +1525,12 @@ namespace UnitTests
         public void WhenCreatingAnUnOrderedListTheListShouldHaveBulletListItemType()
         {
 
-          using (DocX document = DocX.Create("TestListCreateUnorderedList.docx"))
-          {
-            var list = document.AddList("First Item");
+            using (DocX document = DocX.Create("TestListCreateUnorderedList.docx"))
+            {
+                var list = document.AddList("First Item");
 
-            Assert.AreEqual(list.ListItemType, ListItemType.Bulleted);
-          }
+                Assert.AreEqual(list.ListItemType, ListItemType.Bulleted);
+            }
 
         }
 
@@ -1538,12 +1539,18 @@ namespace UnitTests
         public void WhenCreatingAListWithTextTheListShouldHaveTheCorrectRunItemText()
         {
 
-          using (DocX document = DocX.Create("TestListCreateRunText.docx"))
-          {
-            var list = document.AddList("RunText");
+            using (DocX document = DocX.Create("TestListCreateRunText.docx"))
+            {
+                var list = document.AddList("RunText");
 
-            Assert.AreEqual(list.ListItemText, "RunText");
-          }
+                Assert.AreEqual(list.ListItemText, "RunText");
+            }
+        }
+
+        [TestMethod]
+        public void WhenCreatingAListTheNumberingShouldGetSaved()
+        {
+
         }
 
 
@@ -1551,51 +1558,106 @@ namespace UnitTests
         public void WhenCreatingAListTheListStyleShouldExistOrBeCreated()
         {
 
-          using (DocX document = DocX.Create("TestListStyle.docx"))
-          {
-            var style = document.AddStylesForList();
+            using (DocX document = DocX.Create("TestListStyle.docx"))
+            {
+                var style = document.AddStylesForList();
 
-            XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+                XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 
-            bool listStyleExists =
-                (
-                  from s in style.Element(w + "styles").Elements()
-                  let styleId = s.Attribute(XName.Get("styleId", w.NamespaceName))
-                  where (styleId != null && styleId.Value == "ListParagraph")
-                  select s
-                ).Any();
-          
-            Assert.IsTrue(listStyleExists);
+                bool listStyleExists =
+                    (
+                      from s in style.Element(w + "styles").Elements()
+                      let styleId = s.Attribute(XName.Get("styleId", w.NamespaceName))
+                      where (styleId != null && styleId.Value == "ListParagraph")
+                      select s
+                    ).Any();
 
-           }
+                Assert.IsTrue(listStyleExists);
+
+            }
         }
 
+
+        //[TestMethod]
+        //public void WhenGettingListNumValuesForValidListTypesNumberingShouldReturnValues() {
+
+        //  using (DocX document = DocX.Create("TestListNumberingStyle.docx")) {
+        //    var listNumValues = document.GetListNumValues(ListItemType.Bulleted);
+
+        //    Assert.AreEqual(listNumValues.Ilvl, "0");
+        //    Assert.AreEqual(listNumValues.NumId, "1");
+        //  }
+        //}
+
+        //[TestMethod]
+        //public void WhenGettingListNumValuesForInvalidListTypesNumberingShouldReturnNull() {
+
+        //  using (DocX document = DocX.Create("TestListNumberingStyle.docx")) {
+        //    var listNumValues = document.GetListNumValues(ListItemType.Numbered);
+
+        //    Assert.AreEqual(listNumValues.Ilvl, null);
+        //    Assert.AreEqual(listNumValues.NumId, null);
+        //  }
+        //}
 
         [TestMethod]
-        public void WhenGettingListNumValuesForValidListTypesNumberingShouldReturnValues()
+        public void ANewListItemShouldCreateAnAbstractNumberingEntry()
         {
+            using (DocX document = DocX.Create("TestNumbering.docx"))
+            {
+                var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
+                Assert.IsFalse(numbering.Any());
 
-          using (DocX document = DocX.Create("TestListNumberingStyle.docx"))
-          {
-            var listNumValues = document.GetListNumValues(ListItemType.Bulleted);
+                document.AddList("List Text", 0, ListItemType.Numbered);
 
-            Assert.AreEqual(listNumValues.Ilvl, "0");
-            Assert.AreEqual(listNumValues.NumId, "1");
-          }
+                numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
+                Assert.IsTrue(numbering.Any());
+            }
         }
 
-        public void WhenGettingListNumValuesForInvalidListTypesNumberingShouldReturnNull()
+        [TestMethod]
+        public void ANewListItemShouldCreateANewNumEntry()
         {
+            using (DocX document = DocX.Create("TestNumEntry.docx"))
+            {
+                var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
+                Assert.IsFalse(numbering.Any());
 
-          using (DocX document = DocX.Create("TestListNumberingStyle.docx"))
-          {
-            var listNumValues = document.GetListNumValues(ListItemType.None);
+                document.AddList("List Text", 0, ListItemType.Numbered);
 
-            Assert.AreEqual(listNumValues.Ilvl, null);
-            Assert.AreEqual(listNumValues.NumId, null);
-          }
+                numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
+                Assert.IsTrue(numbering.Any());
+            }
         }
 
+        [TestMethod]
+        public void CreateNewNumberingNumIdShouldAddNumberingDataToTheDocument()
+        {
+            using (DocX document = DocX.Create("TestCreateNumbering.docx"))
+            {
+                var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
+                Assert.IsFalse(numbering.Any());
 
+                var ret = document.CreateNewNumberingNumId();
+                numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
+                Assert.IsTrue(ret == 1);
+                Assert.IsTrue(numbering.Any());
+            }
+        }
+
+        [TestMethod]
+        public void CreateNewNumberingNumIdShouldAddNumberingAbstractDataToTheDocument()
+        {
+            using (DocX document = DocX.Create("TestCreateNumberingAbstract.docx"))
+            {
+                var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
+                Assert.IsFalse(numbering.Any());
+
+                var ret = document.CreateNewNumberingNumId();
+                numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
+                Assert.IsTrue(ret == 1);
+                Assert.IsTrue(numbering.Any());
+            }
+        }
     }
 }
