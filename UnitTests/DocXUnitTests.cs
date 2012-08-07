@@ -30,9 +30,9 @@ namespace UnitTests
             // The documents directory
             List<string> steps = directory_executing_assembly.Split('\\').ToList();
             steps.RemoveRange(steps.Count() - 3, 3);
-            //directory_documents = String.Join("\\", steps) + "\\documents\\";
+            directory_documents = String.Join("\\", steps) + "\\documents\\";
 
-            directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
+            //directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
         }
 
         [TestMethod]

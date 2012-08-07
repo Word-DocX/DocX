@@ -1686,7 +1686,7 @@ namespace Novacode
         }
 
         public Table AddTable(int rowCount, int columnCount)
-        {
+        { 
             if (rowCount < 1 || columnCount < 1)
                 throw new ArgumentOutOfRangeException("Row and Column count must be greater than zero.");
 
@@ -1836,8 +1836,6 @@ namespace Novacode
         private void ValidateDocXNumberingPartExists()
         {
             var numberingUri = new Uri("/word/numbering.xml", UriKind.Relative);
-
-            //var listLevelType = isMultiLevel ? "multilevel" : "hybridMultilevel";
 
             // If the internal document contains no /word/numbering.xml create one.
             if (!package.PartExists(numberingUri))
