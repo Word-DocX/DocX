@@ -30,9 +30,9 @@ namespace UnitTests
             // The documents directory
             List<string> steps = directory_executing_assembly.Split('\\').ToList();
             steps.RemoveRange(steps.Count() - 3, 3);
-            directory_documents = String.Join("\\", steps) + "\\documents\\";
+            //directory_documents = String.Join("\\", steps) + "\\documents\\";
 
-            //directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
+            directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
         }
 
         [TestMethod]
@@ -1578,28 +1578,6 @@ namespace UnitTests
         }
 
 
-        //[TestMethod]
-        //public void WhenGettingListNumValuesForValidListTypesNumberingShouldReturnValues() {
-
-        //  using (DocX document = DocX.Create("TestListNumberingStyle.docx")) {
-        //    var listNumValues = document.GetListNumValues(ListItemType.Bulleted);
-
-        //    Assert.AreEqual(listNumValues.Ilvl, "0");
-        //    Assert.AreEqual(listNumValues.NumId, "1");
-        //  }
-        //}
-
-        //[TestMethod]
-        //public void WhenGettingListNumValuesForInvalidListTypesNumberingShouldReturnNull() {
-
-        //  using (DocX document = DocX.Create("TestListNumberingStyle.docx")) {
-        //    var listNumValues = document.GetListNumValues(ListItemType.Numbered);
-
-        //    Assert.AreEqual(listNumValues.Ilvl, null);
-        //    Assert.AreEqual(listNumValues.NumId, null);
-        //  }
-        //}
-
         [TestMethod]
         public void ANewListItemShouldCreateAnAbstractNumberingEntry()
         {
@@ -1659,5 +1637,37 @@ namespace UnitTests
                 Assert.IsTrue(numbering.Any());
             }
         }
+
+      [TestMethod]
+      public void IfPreviousElementIsAListThenAddingANewListContinuesThePreviousList()
+      {
+        using (DocX document = DocX.Create("TestAddListToPreviousList.docx"))
+        {
+          document.AddList("List Text", 0, ListItemType.Numbered);
+          document.AddList("List Text2", 0, ListItemType.Numbered);
+
+          var lvlNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "ilvl").ToList();
+          var numIdNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "numId").ToList();
+
+          Assert.AreEqual(lvlNodes.Count(), 2);
+          Assert.AreEqual(numIdNodes.Count(), 2);
+
+          var prevLvlNode = lvlNodes[0];
+          var newLvlNode = lvlNodes[1];
+
+          Assert.AreEqual(prevLvlNode.Attribute(DocX.w +"val").Value, newLvlNode.Attribute(DocX.w + "val").Value);
+
+          var prevNumIdNode = numIdNodes[0];
+          var newNumIdNode = numIdNodes[1];
+
+          Assert.AreEqual(prevNumIdNode.Attribute(DocX.w + "val").Value, newNumIdNode.Attribute(DocX.w + "val").Value);
+
+        }
+
+      }
+
+
+
+
     }
 }

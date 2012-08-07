@@ -1698,8 +1698,28 @@ namespace Novacode
 
         public ListItem AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
+          var docParagraphs = Document.Paragraphs;
+          int numId = 0;
 
-            var numId = CreateNewNumberingNumId(level, listType);
+          if (docParagraphs.Count > 0)
+          {
+            var lastParagraph = docParagraphs[docParagraphs.Count - 1];
+
+            //if its listItem, get its level and numId attributes
+           //TODO: Check previous and new lists for list type 
+            if (lastParagraph.IsListItem)
+            {
+              var lvlNode = lastParagraph.Xml.Descendants().First(s => s.Name.LocalName == "ilvl");
+              var numIdNode = lastParagraph.Xml.Descendants().First(s => s.Name.LocalName == "numId");
+
+              level = Int32.Parse(lvlNode.Attribute(w + "val").Value);
+              numId = Int32.Parse(numIdNode.Attribute(w + "val").Value);
+            }
+          }
+          else
+          {
+            numId = CreateNewNumberingNumId(level, listType);
+          }
 
             var newParagraphSection = new XElement
               (
