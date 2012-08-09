@@ -1632,7 +1632,7 @@ namespace UnitTests
             using (DocX document = DocX.Create("TestAddListToPreviousList.docx"))
             {
                 var list = document.AddList("List Text", 0, ListItemType.Numbered);
-                document.AddListItem(list, "List Text2");
+                document.AddListItem(list, "List Text2", 0, ListItemType.Numbered);
                 document.InsertList(list);
 
                 var lvlNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "ilvl").ToList();

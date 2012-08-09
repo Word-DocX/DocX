@@ -1709,7 +1709,7 @@ namespace Novacode
         /// </returns>
         public List AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
-            return AddListItem(new List(Document, null), listText, level, trackChanges);
+            return AddListItem(new List(Document, null), listText, level, listType, trackChanges);
         }
 
         /// <summary>
@@ -1724,9 +1724,9 @@ namespace Novacode
         /// Write the list to the Document with InsertList(...) once the list has all the desired 
         /// elements, otherwise the list will not be included in the working Document.
         /// </returns>
-        public List AddListItem(List list, string listText, int level = 0, bool trackChanges = false)
+        public List AddListItem(List list, string listText, int level = 0, ListItemType listType = ListItemType.Numbered, bool trackChanges = false)
         {
-            return HelperFunctions.CreateItemInList(list, listText, level, (ListItemType)list.ListType, trackChanges);
+            return HelperFunctions.CreateItemInList(list, listText, level, listType, trackChanges);
         }
 
         /// <summary>
