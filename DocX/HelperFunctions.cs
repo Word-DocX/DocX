@@ -448,7 +448,7 @@ namespace Novacode
                     );
         }
 
-        internal static List CreateItemInList(List list, string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
+        internal static List CreateItemInList(List list, string listText, int level = 0, ListItemType listType = ListItemType.Numbered, bool trackChanges = false)
         {
             if (list.NumId == 0)
             {

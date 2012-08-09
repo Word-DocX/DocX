@@ -6,6 +6,9 @@ using System.Xml.Linq;
 
 namespace Novacode
 {
+    /// <summary>
+    /// Represents a List in a document.
+    /// </summary>
     public class List : InsertBeforeOrAfter
     {
         /// <summary>
@@ -14,7 +17,13 @@ namespace Novacode
         /// The paragraph needs a numPr defined to be in this items collection.
         /// </summary>
         public List<Paragraph> Items { get; private set; }
+        /// <summary>
+        /// The numId used to reference the list settings in the numbering.xml
+        /// </summary>
         public int NumId { get; private set; }
+        /// <summary>
+        /// The ListItemType (bullet or numbered) of the list.
+        /// </summary>
         public ListItemType? ListType { get; private set; }
 
         internal List(DocX document, XElement xml)
@@ -74,7 +83,7 @@ namespace Novacode
             return false;
         }
 
-        internal void CreateNewNumberingNumId(int level = 0, ListItemType listType = ListItemType.Bulleted)
+        internal void CreateNewNumberingNumId(int level = 0, ListItemType listType = ListItemType.Numbered)
         {
             ValidateDocXNumberingPartExists();
             if (Document.numbering.Root == null)
@@ -183,23 +192,5 @@ namespace Novacode
                 Document.numbering = XDocument.Load(tr);
             }
         }
-
-        //public void InsertBeforeSelf(List list)
-        //{
-        //    foreach (var item in list.Items)
-        //    {
-        //        Document.Xml.AddBeforeSelf(item);
-        //    }
-        //}
-
-        //public void InsertAfterSelf()
-        //{
-        //    for (int i = Items.Count - 1; i >= 0; i--)
-        //    {
-        //        var item = Items[i];
-        //        Document.Xml.AddAfterSelf(item);
-        //    }
-        //}
-
     }
 }

@@ -1695,16 +1695,45 @@ namespace Novacode
             return t;
         }
 
+        /// <summary>
+        /// Create a new list with a list item.
+        /// </summary>
+        /// <param name="listText">The text of the first element in the created list.</param>
+        /// <param name="level">The indentation level of the element in the list.</param>
+        /// <param name="listType">The type of list to be created: Bulleted or Numbered.</param>
+        /// <param name="trackChanges">Enable change tracking</param>
+        /// <returns>
+        /// The created List. Call AddListItem(...) to add more elements to the list.
+        /// Write the list to the Document with InsertList(...) once the list has all the desired 
+        /// elements, otherwise the list will not be included in the working Document.
+        /// </returns>
         public List AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
-            return AddListItem(new List(Document, null), listText, level, listType, trackChanges);
+            return AddListItem(new List(Document, null), listText, level, trackChanges);
         }
 
-        public List AddListItem(List list, string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
+        /// <summary>
+        /// Add a list item to an already existing list.
+        /// </summary>
+        /// <param name="list">The list to add the new list item to.</param>
+        /// <param name="listText">The run text that should be in the new list item.</param>
+        /// <param name="level">The indentation level of the new list element.</param>
+        /// <param name="trackChanges">Enable change tracking</param>
+        /// <returns>
+        /// The created List. Call AddListItem(...) to add more elements to the list.
+        /// Write the list to the Document with InsertList(...) once the list has all the desired 
+        /// elements, otherwise the list will not be included in the working Document.
+        /// </returns>
+        public List AddListItem(List list, string listText, int level = 0, bool trackChanges = false)
         {
-            return HelperFunctions.CreateItemInList(list, listText, level, listType, trackChanges);
+            return HelperFunctions.CreateItemInList(list, listText, level, (ListItemType)list.ListType, trackChanges);
         }
 
+        /// <summary>
+        /// Insert list into the document.
+        /// </summary>
+        /// <param name="list">The list to insert into the document.</param>
+        /// <returns>The list that was inserted into the document.</returns>
         public new List InsertList(List list)
         {
             base.InsertList(list);
@@ -1712,6 +1741,12 @@ namespace Novacode
             return list;
         }
 
+        /// <summary>
+        /// Insert a list at an index location in the document.
+        /// </summary>
+        /// <param name="index">Index in document to insert the list.</param>
+        /// <param name="list">The list that was inserted into the document.</param>
+        /// <returns></returns>
         public new List InsertList(int index, List list)
         {
             base.InsertList(index, list);
