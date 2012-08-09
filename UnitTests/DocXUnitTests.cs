@@ -32,7 +32,7 @@ namespace UnitTests
             steps.RemoveRange(steps.Count() - 3, 3);
             directory_documents = String.Join("\\", steps) + "\\documents\\";
 
-           // directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
+            // directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
         }
 
         [TestMethod]
@@ -1632,7 +1632,7 @@ namespace UnitTests
             using (DocX document = DocX.Create("TestAddListToPreviousList.docx"))
             {
                 var list = document.AddList("List Text", 0, ListItemType.Numbered);
-                document.AddListItem(list, "List Text2", 0, ListItemType.Numbered);
+                document.AddListItem(list, "List Text2");
                 document.InsertList(list);
 
                 var lvlNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "ilvl").ToList();
@@ -1659,13 +1659,13 @@ namespace UnitTests
         public void WhenADocumentHasListsTheListPropertyReturnsTheCorrectNumberOfLists()
         {
 
-          using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedUnorderedLists.docx"))
-          {
-            var lists = document.Lists;
+            using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedUnorderedLists.docx"))
+            {
+                var lists = document.Lists;
 
-            Assert.AreEqual(lists.Count, 2);
+                Assert.AreEqual(lists.Count, 2);
 
-          }
+            }
         }
 
 
