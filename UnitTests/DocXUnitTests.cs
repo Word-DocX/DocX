@@ -30,9 +30,9 @@ namespace UnitTests
             // The documents directory
             List<string> steps = directory_executing_assembly.Split('\\').ToList();
             steps.RemoveRange(steps.Count() - 3, 3);
-            directory_documents = String.Join("\\", steps) + "\\documents\\";
+           // directory_documents = String.Join("\\", steps) + "\\documents\\";
 
-            //directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
+            directory_documents = "C:\\Users\\Faizan\\DocX\\UnitTests\\documents\\";
         }
 
         [TestMethod]
@@ -1654,5 +1654,21 @@ namespace UnitTests
             }
 
         }
+
+      [TestMethod]
+      public void WhenADocumentHasListsTheListPropertyReturnsTheCorrectNumberOfLists()
+      {
+
+        using (DocX document = DocX.Load(directory_documents + "testdoc_OrderedUnorderedLists.docx"))
+        {
+          var lists = document.Lists;
+
+          Assert.AreEqual(lists.Count, 2);
+
+        }
+      }
+
+
+
     }
 }
