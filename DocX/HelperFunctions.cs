@@ -365,7 +365,7 @@ namespace Novacode
             return stylesDoc;
         }
 
-        static internal XElement CreateEdit(EditType t, DateTime edit_time, object content)
+        internal static XElement CreateEdit(EditType t, DateTime edit_time, object content)
         {
             if (t == EditType.del)
             {
@@ -448,6 +448,31 @@ namespace Novacode
                     );
         }
 
+        internal static List CreateItemInList(List list, string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
+        {
+            if (list.NumId == 0)
+            {
+                list.CreateNewNumberingNumId(level, listType);
+            }
+
+            var newParagraphSection = new XElement
+              (
+              XName.Get("p", DocX.w.NamespaceName),
+              new XElement(XName.Get("pPr", DocX.w.NamespaceName),
+                           new XElement(XName.Get("numPr", DocX.w.NamespaceName),
+                                        new XElement(XName.Get("ilvl", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", level)),
+                                        new XElement(XName.Get("numId", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", list.NumId)))),
+             new XElement(XName.Get("r", DocX.w.NamespaceName), new XElement(XName.Get("t", DocX.w.NamespaceName), listText))
+              );
+
+            if (trackChanges)
+                newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+
+            list.AddItem(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph));
+
+            return list;
+        }
+
         internal static void RenumberIDs(DocX document)
         {
             IEnumerable<XAttribute> trackerIDs =
@@ -459,7 +484,7 @@ namespace Novacode
                 trackerIDs.ElementAt(i).Value = i.ToString();
         }
 
-        static internal Paragraph GetFirstParagraphEffectedByInsert(DocX document, int index)
+        internal static Paragraph GetFirstParagraphEffectedByInsert(DocX document, int index)
         {
             // This document contains no Paragraphs and insertion is at index 0
             if (document.paragraphLookup.Keys.Count() == 0 && index == 0)
@@ -528,7 +553,7 @@ namespace Novacode
             return newRuns;
         }
 
-        static internal XElement[] SplitParagraph(Paragraph p, int index)
+        internal static XElement[] SplitParagraph(Paragraph p, int index)
         {
             // In this case edit dosent really matter, you have a choice.
             Run r = p.GetFirstRunEffectedByEdit(index, EditType.ins);
@@ -570,7 +595,7 @@ namespace Novacode
         /// Bug found and fixed by trnilse. To see the change, 
         /// please compare this release to the previous release using TFS compare.
         /// -->
-        static internal bool IsSameFile(Stream streamOne, Stream streamTwo)
+        internal static bool IsSameFile(Stream streamOne, Stream streamTwo)
         {
             int file1byte, file2byte;
 

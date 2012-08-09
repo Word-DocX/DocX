@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
-using System.IO.Packaging;
 using System.IO;
+using System.IO.Packaging;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Novacode
 {
@@ -56,9 +56,9 @@ namespace Novacode
         /// }// Release this document from memory.
         /// </code>
         /// </example>
-        public virtual List<Paragraph> Paragraphs 
+        public virtual List<Paragraph> Paragraphs
         {
-            get 
+            get
             {
                 List<Paragraph> paragraphs = GetParagraphs();
 
@@ -69,16 +69,12 @@ namespace Novacode
 
                     p.ParentContainer = GetParentFromXmlName(p.Xml.Ancestors().First().Name.LocalName);
 
-                    var paraNumProperties = p.Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr");
-
-                    p.IsListItem = paraNumProperties != null;
-
-                  if (p.IsListItem)
+                    if (p.IsListItem)
                     {
-                      GetListItemType(paraNumProperties, p);
+                        GetListItemType(p);
                     }
                 }
-                
+
                 return paragraphs;
             }
         }
@@ -87,80 +83,80 @@ namespace Novacode
 
         public virtual List<Section> Sections
         {
-          get
-          {
-            var allParas = Paragraphs;
-
-            var parasInASection = new List<Paragraph>();
-            var sections = new List<Section>();
-
-            foreach (var para in allParas)
+            get
             {
+                var allParas = Paragraphs;
 
-              var sectionInPara = para.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "sectPr");
+                var parasInASection = new List<Paragraph>();
+                var sections = new List<Section>();
 
-              if (sectionInPara == null)
-              {
-                parasInASection.Add(para);
-              }
-              else
-              {
-                parasInASection.Add(para);
-                var section = new Section(Document, sectionInPara) {SectionParagraphs = parasInASection};
-                sections.Add(section);
-                parasInASection = new List<Paragraph>();
-              }
+                foreach (var para in allParas)
+                {
 
+                    var sectionInPara = para.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "sectPr");
+
+                    if (sectionInPara == null)
+                    {
+                        parasInASection.Add(para);
+                    }
+                    else
+                    {
+                        parasInASection.Add(para);
+                        var section = new Section(Document, sectionInPara) { SectionParagraphs = parasInASection };
+                        sections.Add(section);
+                        parasInASection = new List<Paragraph>();
+                    }
+
+                }
+
+                XElement body = Xml.Element(XName.Get("body", DocX.w.NamespaceName));
+                XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
+                var baseSection = new Section(Document, baseSectionXml) { SectionParagraphs = parasInASection };
+                sections.Add(baseSection);
+
+                return sections;
+            }
+        }
+
+
+        private void GetListItemType(Paragraph p)
+        {
+            var ilvlNode = p.ParagraphNumberProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "ilvl");
+            var ilvlValue = ilvlNode.Attribute(DocX.w + "val").Value;
+
+            var numIdNode = p.ParagraphNumberProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "numId");
+            var numIdValue = numIdNode.Attribute(DocX.w + "val").Value;
+
+            //find num node in numbering 
+            var numNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "num");
+            XElement numNode = numNodes.FirstOrDefault(node => node.Attribute(DocX.w + "numId").Value.Equals(numIdValue));
+
+            //Get abstractNumId node and its value from numNode
+            var abstractNumIdNode = numNode.Descendants().First(n => n.Name.LocalName == "abstractNumId");
+            var abstractNumNodeValue = abstractNumIdNode.Attribute(DocX.w + "val").Value;
+
+            var abstractNumNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "abstractNum");
+            XElement abstractNumNode =
+              abstractNumNodes.FirstOrDefault(node => node.Attribute(DocX.w + "abstractNumId").Value.Equals(abstractNumNodeValue));
+
+            //Find lvl node
+            var lvlNodes = abstractNumNode.Descendants().Where(n => n.Name.LocalName == "lvl");
+            XElement lvlNode = null;
+            foreach (XElement node in lvlNodes)
+            {
+                if (node.Attribute(DocX.w + "ilvl").Value.Equals(ilvlValue))
+                {
+                    lvlNode = node;
+                    break;
+                }
             }
 
-            XElement body = Xml.Element(XName.Get("body", DocX.w.NamespaceName));
-            XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
-            var baseSection = new Section(Document, baseSectionXml) {SectionParagraphs = parasInASection};
-            sections.Add(baseSection);
-
-            return sections;
-          }
+            var numFmtNode = lvlNode.Descendants().First(n => n.Name.LocalName == "numFmt");
+            p.ListItemType = GetListItemType(numFmtNode.Attribute(DocX.w + "val").Value);
         }
 
 
-      private void GetListItemType(XElement paraNumProperties, Paragraph p)
-      {
-        var ilvlNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "ilvl");
-        var ilvlValue = ilvlNode.Attribute(DocX.w + "val").Value;
-
-        var numIdNode = paraNumProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "numId");
-        var numIdValue = numIdNode.Attribute(DocX.w + "val").Value;
-
-        //find num node in numbering 
-        var numNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "num");
-        XElement numNode = numNodes.FirstOrDefault(node => node.Attribute(DocX.w + "numId").Value.Equals(numIdValue));
-
-        //Get abstractNumId node and its value from numNode
-        var abstractNumIdNode = numNode.Descendants().First(n => n.Name.LocalName == "abstractNumId");
-        var abstractNumNodeValue = abstractNumIdNode.Attribute(DocX.w + "val").Value;
-
-        var abstractNumNodes = Document.numbering.Descendants().Where(n => n.Name.LocalName == "abstractNum");
-        XElement abstractNumNode =
-          abstractNumNodes.FirstOrDefault(node => node.Attribute(DocX.w + "abstractNumId").Value.Equals(abstractNumNodeValue));
-
-        //Find lvl node
-        var lvlNodes = abstractNumNode.Descendants().Where(n => n.Name.LocalName == "lvl");
-        XElement lvlNode = null;
-        foreach (XElement node in lvlNodes)
-        {
-          if (node.Attribute(DocX.w + "ilvl").Value.Equals(ilvlValue))
-          {
-            lvlNode = node;
-            break;
-          }
-        }
-
-        var numFmtNode = lvlNode.Descendants().First(n => n.Name.LocalName == "numFmt");
-        p.ListItemType = GetListItemType(numFmtNode.Attribute(DocX.w + "val").Value);
-      }
-
-
-      public ContainerType ParentContainer;
+        public ContainerType ParentContainer;
 
 
         internal List<Paragraph> GetParagraphs()
@@ -189,13 +185,13 @@ namespace Novacode
 
             else
             {
-              if (Xml.HasElements)
-              {
-                foreach (XElement e in Xml.Elements())
+                if (Xml.HasElements)
                 {
-                  GetParagraphsRecursive(e, ref index, ref paragraphs);
+                    foreach (XElement e in Xml.Elements())
+                    {
+                        GetParagraphsRecursive(e, ref index, ref paragraphs);
+                    }
                 }
-              }
             }
         }
 
@@ -210,6 +206,30 @@ namespace Novacode
                 ).ToList();
 
                 return tables;
+            }
+        }
+
+        public virtual List<List> Lists
+        {
+            get
+            {
+                var lists = new List<List>();
+                var list = new List(Document, Xml);
+
+                foreach (var paragraph in Paragraphs)
+                {
+                    if (paragraph.IsListItem)
+                    {
+                        list.AddItem(paragraph);
+                    }
+                    else
+                    {
+                        lists.Add(list);
+                        list = new List(Document, Xml);
+                    }
+                }
+
+                return lists;
             }
         }
 
@@ -320,7 +340,7 @@ namespace Novacode
 
             // this dictionary is used to collect results and test for uniqueness
             Dictionary<string, int> uniqueResults = new Dictionary<string, int>();
-            
+
             foreach (string currValue in rawResults)
             {
                 if (!uniqueResults.ContainsKey(currValue))
@@ -486,109 +506,109 @@ namespace Novacode
 
             GetParent(newParagraph);
 
-          return newParagraph;
+            return newParagraph;
         }
 
 
         private ContainerType GetParentFromXmlName(string xmlName)
         {
-          ContainerType parent;
+            ContainerType parent;
 
-          switch (xmlName)
-          {
-            case "body":
-              parent = ContainerType.Body;
-              break;
-            case "p":
-              parent = ContainerType.Paragraph;
-              break;
-            case "tbl":
-              parent = ContainerType.Table;
-              break;
-            case "sectPr":
-              parent = ContainerType.Section;
-              break;
-            case "tc":
-              parent = ContainerType.Cell;
-              break;
-            default:
-              parent = ContainerType.None;
-              break;
-          }
-          return parent;
+            switch (xmlName)
+            {
+                case "body":
+                    parent = ContainerType.Body;
+                    break;
+                case "p":
+                    parent = ContainerType.Paragraph;
+                    break;
+                case "tbl":
+                    parent = ContainerType.Table;
+                    break;
+                case "sectPr":
+                    parent = ContainerType.Section;
+                    break;
+                case "tc":
+                    parent = ContainerType.Cell;
+                    break;
+                default:
+                    parent = ContainerType.None;
+                    break;
+            }
+            return parent;
         }
 
-      private void GetParent(Paragraph newParagraph)
-      {
-        var containerType = GetType();
-
-        switch (containerType.Name)
+        private void GetParent(Paragraph newParagraph)
         {
-          
-          case "Body":
-            newParagraph.ParentContainer = ContainerType.Body;
-            break;
-          case "Table":
-            newParagraph.ParentContainer = ContainerType.Table;
-            break;
-          case "TOC":
-            newParagraph.ParentContainer = ContainerType.TOC;
-            break;
-          case "Section":
-            newParagraph.ParentContainer = ContainerType.Section;
-            break;
-          case "Cell":
-            newParagraph.ParentContainer = ContainerType.Cell;
-            break;
-          case "Header":
-            newParagraph.ParentContainer = ContainerType.Header;
-            break;
-          case "Footer":
-            newParagraph.ParentContainer = ContainerType.Footer;
-            break;
-          case "Paragraph":
-            newParagraph.ParentContainer = ContainerType.Paragraph;
-            break;
-        }
-      }
+            var containerType = GetType();
 
+            switch (containerType.Name)
+            {
 
-      private ListItemType GetListItemType(string styleName)
-      {
-        ListItemType listItemType;
-
-        switch (styleName)
-        {
-          case "bullet":
-            listItemType = ListItemType.Bulleted;
-            break;
-          default:
-            listItemType = ListItemType.Numbered;
-            break;
+                case "Body":
+                    newParagraph.ParentContainer = ContainerType.Body;
+                    break;
+                case "Table":
+                    newParagraph.ParentContainer = ContainerType.Table;
+                    break;
+                case "TOC":
+                    newParagraph.ParentContainer = ContainerType.TOC;
+                    break;
+                case "Section":
+                    newParagraph.ParentContainer = ContainerType.Section;
+                    break;
+                case "Cell":
+                    newParagraph.ParentContainer = ContainerType.Cell;
+                    break;
+                case "Header":
+                    newParagraph.ParentContainer = ContainerType.Header;
+                    break;
+                case "Footer":
+                    newParagraph.ParentContainer = ContainerType.Footer;
+                    break;
+                case "Paragraph":
+                    newParagraph.ParentContainer = ContainerType.Paragraph;
+                    break;
+            }
         }
 
-        return listItemType;
-      }
 
-
-
-      public virtual void InsertSection()
-      {
-
-         InsertSection(false);
-      }
-
-      public virtual void InsertSection(bool trackChanges)
+        private ListItemType GetListItemType(string styleName)
         {
-          var newParagraphSection = new XElement
-          (
-              XName.Get("p", DocX.w.NamespaceName), new XElement(XName.Get("pPr", DocX.w.NamespaceName), new XElement(XName.Get("sectPr", DocX.w.NamespaceName), new XElement(XName.Get("type", DocX.w.NamespaceName),new XAttribute(DocX.w + "val", "continuous") )))
-          );
+            ListItemType listItemType;
 
-          if (trackChanges)
-            newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+            switch (styleName)
+            {
+                case "bullet":
+                    listItemType = ListItemType.Bulleted;
+                    break;
+                default:
+                    listItemType = ListItemType.Numbered;
+                    break;
+            }
 
-          Xml.Add(newParagraphSection);
+            return listItemType;
+        }
+
+
+
+        public virtual void InsertSection()
+        {
+
+            InsertSection(false);
+        }
+
+        public virtual void InsertSection(bool trackChanges)
+        {
+            var newParagraphSection = new XElement
+            (
+                XName.Get("p", DocX.w.NamespaceName), new XElement(XName.Get("pPr", DocX.w.NamespaceName), new XElement(XName.Get("sectPr", DocX.w.NamespaceName), new XElement(XName.Get("type", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", "continuous"))))
+            );
+
+            if (trackChanges)
+                newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+
+            Xml.Add(newParagraphSection);
 
         }
 
@@ -596,12 +616,12 @@ namespace Novacode
         public virtual Paragraph InsertParagraph(string text)
         {
 
-          return InsertParagraph(text, false, new Formatting());
+            return InsertParagraph(text, false, new Formatting());
         }
 
         public virtual Paragraph InsertParagraph(string text, bool trackChanges)
         {
-          return InsertParagraph(text, trackChanges, new Formatting());
+            return InsertParagraph(text, trackChanges, new Formatting());
         }
 
         public virtual Paragraph InsertParagraph(string text, bool trackChanges, Formatting formatting)
@@ -616,9 +636,9 @@ namespace Novacode
 
             Xml.Add(newParagraph);
 
-          var paragraphAdded = Paragraphs.Last();
+            var paragraphAdded = Paragraphs.Last();
 
-           GetParent(paragraphAdded);
+            GetParent(paragraphAdded);
 
             return paragraphAdded;
         }
@@ -626,7 +646,7 @@ namespace Novacode
         public virtual Paragraph InsertEquation(string equation)
         {
             Paragraph p = InsertParagraph();
-            p.AppendEquation(equation);                        
+            p.AppendEquation(equation);
             return p;
         }
 
@@ -695,7 +715,30 @@ namespace Novacode
         internal Container(DocX document, XElement xml)
             : base(document, xml)
         {
-            
+
+        }
+
+        public List InsertList(List list)
+        {
+            foreach (var item in list.Items)
+            {
+                Xml.Add(item.Xml);
+            }
+
+            return list;
+        }
+
+        public List InsertList(int index, List list)
+        {
+            Paragraph p = HelperFunctions.GetFirstParagraphEffectedByInsert(Document, index);
+
+            XElement[] split = HelperFunctions.SplitParagraph(p, index - p.startIndex);
+            var elements = new List<XElement> { split[0] };
+            elements.AddRange(list.Items.Select(i => new XElement(i.Xml)));
+            elements.Add(split[1]);
+            p.Xml.ReplaceWith(elements.ToArray());
+
+            return list;
         }
     }
 }

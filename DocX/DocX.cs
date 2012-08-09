@@ -1686,7 +1686,7 @@ namespace Novacode
         }
 
         public Table AddTable(int rowCount, int columnCount)
-        { 
+        {
             if (rowCount < 1 || columnCount < 1)
                 throw new ArgumentOutOfRangeException("Row and Column count must be greater than zero.");
 
@@ -1695,157 +1695,28 @@ namespace Novacode
             return t;
         }
 
-
-        public ListItem AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
+        public List AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
-          var docParagraphs = Document.Paragraphs;
-          int numId = 0;
-
-          if (docParagraphs.Count > 0)
-          {
-            var lastParagraph = docParagraphs[docParagraphs.Count - 1];
-
-            //if its listItem, get its level and numId attributes
-           //TODO: Check previous and new lists for list type 
-            if (lastParagraph.IsListItem)
-            {
-              var lvlNode = lastParagraph.Xml.Descendants().First(s => s.Name.LocalName == "ilvl");
-              var numIdNode = lastParagraph.Xml.Descendants().First(s => s.Name.LocalName == "numId");
-
-              level = Int32.Parse(lvlNode.Attribute(w + "val").Value);
-              numId = Int32.Parse(numIdNode.Attribute(w + "val").Value);
-            }
-          }
-          else
-          {
-            numId = CreateNewNumberingNumId(level, listType);
-          }
-
-            var newParagraphSection = new XElement
-              (
-              XName.Get("p", w.NamespaceName),
-              new XElement(XName.Get("pPr", w.NamespaceName),
-                           new XElement(XName.Get("numPr", w.NamespaceName),
-                                        new XElement(XName.Get("ilvl", w.NamespaceName), new XAttribute(w + "val", level)),
-                                        new XElement(XName.Get("numId", w.NamespaceName), new XAttribute(w + "val", numId)))),
-             new XElement(XName.Get("r", w.NamespaceName), new XElement(XName.Get("t", w.NamespaceName), listText))
-              );
-
-            if (trackChanges)
-                newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
-
-            Xml.Add(newParagraphSection);
-
-            return new ListItem { Level = level, ListItemText = listText, ListItemType = listType };
-
+            return AddListItem(new List(Document, null), listText, level, listType, trackChanges);
         }
 
-        internal int CreateNewNumberingNumId(int level = 0, ListItemType listType = ListItemType.Bulleted)
+        public List AddListItem(List list, string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, bool trackChanges = false)
         {
-            ValidateDocXNumberingPartExists();
-            if (numbering.Root == null)
-            {
-                throw new InvalidOperationException("Numbering section did not instantiate properly.");
-            }
-
-            var numId = GetMaxNumId() + 1;
-            var abstractNumId = GetMaxAbstractNumId() + 1;
-
-            XDocument listTemplate;
-            switch (listType)
-            {
-                case ListItemType.Bulleted:
-                    listTemplate = HelperFunctions.DecompressXMLResource("Novacode.Resources.numbering.default_bullet_abstract.xml.gz");
-                    break;
-                case ListItemType.Numbered:
-                    listTemplate = HelperFunctions.DecompressXMLResource("Novacode.Resources.numbering.default_decimal_abstract.xml.gz");
-                    break;
-                default:
-                    throw new InvalidOperationException(string.Format("Unable to deal with ListItemType: {0}.", listType.ToString()));
-            }
-            var abstractNumTemplate = listTemplate.Descendants().Single(d => d.Name.LocalName == "abstractNum");
-            abstractNumTemplate.SetAttributeValue(w + "abstractNumId", abstractNumId);
-
-
-            numbering.Root.Add(abstractNumTemplate);
-            numbering.Root.Add(
-                new XElement(
-                    XName.Get("num", w.NamespaceName),
-                    new XAttribute(w + "numId", numId),
-                    new XElement(XName.Get("abstractNumId", w.NamespaceName),
-                                    new XAttribute(w + "val", abstractNumId))
-                )
-            );
-
-            return numId;
+            return HelperFunctions.CreateItemInList(list, listText, level, listType, trackChanges);
         }
 
-        /// <summary>
-        /// Method to determine the last numId for a list element. 
-        /// Also useful for determining the next numId to use for inserting a new list element into the document.
-        /// </summary>
-        /// <returns>
-        /// 0 if there are no elements in the list already.
-        /// Increment the return for the next valid value of a new list element.
-        /// </returns>
-        public int GetMaxNumId()
+        public new List InsertList(List list)
         {
-            const int defaultValue = 0;
-            if (numbering == null)
-                return defaultValue;
-
-            var numlist = numbering.Descendants().Where(d => d.Name.LocalName == "num").ToList();
-            if (numlist.Any())
-                return numlist.Max(e => int.Parse(e.Value));
-            return defaultValue;
+            base.InsertList(list);
+            list.Items.ForEach(i => i.mainPart = mainPart);
+            return list;
         }
 
-        /// <summary>
-        /// Method to determine the last abstractNumId for a list element.
-        /// Also useful for determining the next abstractNumId to use for inserting a new list element into the document.
-        /// </summary>
-        /// <returns>
-        /// -1 if there are no elements in the list already.
-        /// Increment the return for the next valid value of a new list element.
-        /// </returns>
-        public int GetMaxAbstractNumId()
+        public new List InsertList(int index, List list)
         {
-            const int defaultValue = -1;
-
-            if (numbering == null)
-                return defaultValue;
-
-            var numlist = numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum").ToList();
-            if (numlist.Any())
-                return numlist.Max(e => int.Parse(e.Value));
-            return defaultValue;
-        }
-
-        /// <summary>
-        /// Get the abstractNum definition for the given numId
-        /// </summary>
-        /// <param name="numId">The numId on the pPr element</param>
-        /// <returns>XElement representing the requested abstractNum</returns>
-        public XElement GetAbstractNum(int numId)
-        {
-            var num = numbering.Descendants().First(d => d.Name.LocalName == "num" && d.GetAttribute(w + "numId").Equals(numId.ToString()));
-            var abstractNumId = num.Descendants().First(d => d.Name.LocalName == "abstractNumId");
-            return numbering.Descendants().First(d => d.Name.LocalName == "abstractNum" && d.GetAttribute("abstractNumId").Equals(abstractNumId.Value));
-        }
-
-        private void ValidateDocXNumberingPartExists()
-        {
-            var numberingUri = new Uri("/word/numbering.xml", UriKind.Relative);
-
-            // If the internal document contains no /word/numbering.xml create one.
-            if (!package.PartExists(numberingUri))
-                HelperFunctions.AddDefaultNumberingXml(package);
-
-            //XDocument numbering;
-            using (TextReader tr = new StreamReader(package.GetPart(numberingUri).GetStream()))
-            {
-                numbering = XDocument.Load(tr);
-            }
+            base.InsertList(index, list);
+            list.Items.ForEach(i => i.mainPart = mainPart);
+            return list;
         }
 
         internal XDocument AddStylesForList()
@@ -1900,8 +1771,6 @@ namespace Novacode
 
             return wordStyles;
         }
-
-
 
         /// <summary>
         /// Insert a Table into this document. The Table's source can be a completely different document.
@@ -3913,6 +3782,16 @@ namespace Novacode
             {
                 List<Paragraph> l = base.Paragraphs;
                 l.ForEach(x => x.PackagePart = mainPart);
+                return l;
+            }
+        }
+
+        public override List<List> Lists
+        {
+            get
+            {
+                List<List> l = base.Lists;
+                l.ForEach(x => x.Items.ForEach(i => i.PackagePart = mainPart));
                 return l;
             }
         }

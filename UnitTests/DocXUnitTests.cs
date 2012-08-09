@@ -1299,7 +1299,6 @@ namespace UnitTests
 
         }
 
-
         [TestMethod]
         public void Test_Sections_And_Paragraphs_When_Creating_Doc()
         {
@@ -1319,7 +1318,6 @@ namespace UnitTests
 
 
         }
-
 
         [TestMethod]
         public void Test_ParentContainer_When_Reading_Doc()
@@ -1347,7 +1345,6 @@ namespace UnitTests
 
         }
 
-
         [TestMethod]
         public void Test_Section_Paragraph_Count_Match_When_Reading_Doc()
         {
@@ -1362,8 +1359,6 @@ namespace UnitTests
                 Assert.AreEqual(sections[3].SectionParagraphs.Count, 1);
             }
         }
-
-
 
         [TestMethod]
         public void Test_Section_Paragraph_Content_Match_When_Reading_Doc()
@@ -1380,8 +1375,6 @@ namespace UnitTests
 
             }
         }
-
-
 
         [TestMethod]
         public void Test_Ordered_List_When_Reading_Doc()
@@ -1401,8 +1394,6 @@ namespace UnitTests
             }
         }
 
-
-
         [TestMethod]
         public void Test_Unordered_List_When_Reading_Doc()
         {
@@ -1420,7 +1411,6 @@ namespace UnitTests
                 Assert.AreEqual(sections[0].SectionParagraphs[2].ListItemType, ListItemType.Bulleted);
             }
         }
-
 
         [TestMethod]
         public void Test_Ordered_Unordered_Lists_When_Reading_Doc()
@@ -1449,21 +1439,21 @@ namespace UnitTests
             }
         }
 
-
         [TestMethod]
         public void WhenCreatingAnOrderedListTheListXmlShouldHaveNumberedListItemType()
         {
 
             using (DocX document = DocX.Create("TestListXmlNumbered.docx"))
             {
-                var level = 0;
+                const int level = 0;
                 XNamespace w = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-                document.AddList("First Item", level, ListItemType.Numbered);
+                var list = document.AddList("First Item", level, ListItemType.Numbered);
+                document.InsertList(list);
 
                 var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
 
                 var numId = listNumPropNode.Descendants().First(s => s.Name.LocalName == "numId");
-                var abstractNum = document.GetAbstractNum(int.Parse(numId.GetAttribute(w + "val")));
+                var abstractNum = list.GetAbstractNum(int.Parse(numId.GetAttribute(w + "val")));
                 var lvl = abstractNum.Descendants().First(d => d.Name.LocalName == "lvl" && d.GetAttribute(w + "ilvl").Equals(level.ToString()));
                 var numFormat = lvl.Descendants().First(d => d.Name.LocalName == "numFmt");
 
@@ -1472,7 +1462,6 @@ namespace UnitTests
 
         }
 
-
         [TestMethod]
         public void WhenCreatingAnUnOrderedListTheListXmlShouldHaveBulletListItemType()
         {
@@ -1480,6 +1469,7 @@ namespace UnitTests
             using (DocX document = DocX.Create("TestListXmlBullet.docx"))
             {
                 var list = document.AddList("First Item");
+                document.InsertList(list);
 
                 var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
 
@@ -1489,23 +1479,24 @@ namespace UnitTests
             }
         }
 
-
         [TestMethod]
         public void WhenCreatingAListWithTextTheListXmlShouldHaveTheCorrectRunItemText()
         {
             using (DocX document = DocX.Create("TestListCreate.docx"))
             {
-                var list = document.AddList("RunText");
+                const string listText = "RunText";
+                var list = document.AddList(listText);
+                document.InsertList(list);
 
                 var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
 
                 var runTextNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "t");
 
                 Assert.IsNotNull(listNumPropNode);
-                Assert.AreEqual(list.ListItemText, runTextNode.Value);
+                Assert.AreEqual(list.Items.First().runs.First().Value, runTextNode.Value);
+                Assert.AreEqual(listText, runTextNode.Value);
             }
         }
-
 
         [TestMethod]
         public void WhenCreatingAnOrderedListTheListShouldHaveNumberedListItemType()
@@ -1515,11 +1506,10 @@ namespace UnitTests
             {
                 var list = document.AddList("First Item", 0, ListItemType.Numbered);
 
-                Assert.AreEqual(list.ListItemType, ListItemType.Numbered);
+                Assert.AreEqual(list.ListType, ListItemType.Numbered);
             }
 
         }
-
 
         [TestMethod]
         public void WhenCreatingAnUnOrderedListTheListShouldHaveBulletListItemType()
@@ -1529,11 +1519,10 @@ namespace UnitTests
             {
                 var list = document.AddList("First Item");
 
-                Assert.AreEqual(list.ListItemType, ListItemType.Bulleted);
+                Assert.AreEqual(list.ListType, ListItemType.Bulleted);
             }
 
         }
-
 
         [TestMethod]
         public void WhenCreatingAListWithTextTheListShouldHaveTheCorrectRunItemText()
@@ -1542,8 +1531,9 @@ namespace UnitTests
             using (DocX document = DocX.Create("TestListCreateRunText.docx"))
             {
                 var list = document.AddList("RunText");
+                document.InsertList(list);
 
-                Assert.AreEqual(list.ListItemText, "RunText");
+                Assert.AreEqual(list.Items.First().runs.First().Value, "RunText");
             }
         }
 
@@ -1552,7 +1542,6 @@ namespace UnitTests
         {
 
         }
-
 
         [TestMethod]
         public void WhenCreatingAListTheListStyleShouldExistOrBeCreated()
@@ -1576,7 +1565,6 @@ namespace UnitTests
 
             }
         }
-
 
         [TestMethod]
         public void ANewListItemShouldCreateAnAbstractNumberingEntry()
@@ -1615,10 +1603,10 @@ namespace UnitTests
             {
                 var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
                 Assert.IsFalse(numbering.Any());
+                var list = document.AddList("");
+                document.InsertList(list);
 
-                var ret = document.CreateNewNumberingNumId();
                 numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
-                Assert.IsTrue(ret == 1);
                 Assert.IsTrue(numbering.Any());
             }
         }
@@ -1630,44 +1618,41 @@ namespace UnitTests
             {
                 var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
                 Assert.IsFalse(numbering.Any());
+                var list = document.AddList("");
+                document.InsertList(list);
 
-                var ret = document.CreateNewNumberingNumId();
                 numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
-                Assert.IsTrue(ret == 1);
                 Assert.IsTrue(numbering.Any());
             }
         }
 
-      [TestMethod]
-      public void IfPreviousElementIsAListThenAddingANewListContinuesThePreviousList()
-      {
-        using (DocX document = DocX.Create("TestAddListToPreviousList.docx"))
+        [TestMethod]
+        public void IfPreviousElementIsAListThenAddingANewListContinuesThePreviousList()
         {
-          document.AddList("List Text", 0, ListItemType.Numbered);
-          document.AddList("List Text2", 0, ListItemType.Numbered);
+            using (DocX document = DocX.Create("TestAddListToPreviousList.docx"))
+            {
+                var list = document.AddList("List Text", 0, ListItemType.Numbered);
+                document.AddListItem(list, "List Text2", 0, ListItemType.Numbered);
+                document.InsertList(list);
 
-          var lvlNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "ilvl").ToList();
-          var numIdNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "numId").ToList();
+                var lvlNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "ilvl").ToList();
+                var numIdNodes = document.mainDoc.Descendants().Where(s => s.Name.LocalName == "numId").ToList();
 
-          Assert.AreEqual(lvlNodes.Count(), 2);
-          Assert.AreEqual(numIdNodes.Count(), 2);
+                Assert.AreEqual(lvlNodes.Count(), 2);
+                Assert.AreEqual(numIdNodes.Count(), 2);
 
-          var prevLvlNode = lvlNodes[0];
-          var newLvlNode = lvlNodes[1];
+                var prevLvlNode = lvlNodes[0];
+                var newLvlNode = lvlNodes[1];
 
-          Assert.AreEqual(prevLvlNode.Attribute(DocX.w +"val").Value, newLvlNode.Attribute(DocX.w + "val").Value);
+                Assert.AreEqual(prevLvlNode.Attribute(DocX.w + "val").Value, newLvlNode.Attribute(DocX.w + "val").Value);
 
-          var prevNumIdNode = numIdNodes[0];
-          var newNumIdNode = numIdNodes[1];
+                var prevNumIdNode = numIdNodes[0];
+                var newNumIdNode = numIdNodes[1];
 
-          Assert.AreEqual(prevNumIdNode.Attribute(DocX.w + "val").Value, newNumIdNode.Attribute(DocX.w + "val").Value);
+                Assert.AreEqual(prevNumIdNode.Attribute(DocX.w + "val").Value, newNumIdNode.Attribute(DocX.w + "val").Value);
+                document.Save();
+            }
 
         }
-
-      }
-
-
-
-
     }
 }

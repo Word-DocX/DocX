@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
-using System.Security.Principal;
-using System.IO.Packaging;
-using System.IO;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
+using System.IO.Packaging;
+using System.Linq;
+using System.Security.Principal;
+using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 
 namespace Novacode
@@ -28,9 +28,23 @@ namespace Novacode
 
         public ContainerType ParentContainer;
 
-        public bool IsListItem;
+        private XElement ParagraphNumberProperties_Backer { get; set; }
+        public XElement ParagraphNumberProperties
+        {
+            get
+            {
+                return ParagraphNumberProperties_Backer ?? (ParagraphNumberProperties_Backer = Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr"));
+            }
+        }
+        public bool IsListItem
+        {
+            get
+            {
+                return ParagraphNumberProperties != null;
+            }
+        }
 
-        public ListItemType ListItemType; 
+        public ListItemType ListItemType;
 
         internal int startIndex, endIndex;
 
@@ -54,7 +68,7 @@ namespace Novacode
         /// }
         /// </code>
         /// </example>
-        public List<Picture> Pictures 
+        public List<Picture> Pictures
         {
             get
             {
@@ -73,7 +87,7 @@ namespace Novacode
                     select new Picture(Document, p, img)
                 ).ToList();
 
-                
+
                 return pictures;
             }
         }
@@ -102,10 +116,10 @@ namespace Novacode
         /// }
         /// </code>
         /// </example>
-        public List<Hyperlink> Hyperlinks 
+        public List<Hyperlink> Hyperlinks
         {
-            get 
-            {  
+            get
+            {
                 List<Hyperlink> hyperlinks = new List<Hyperlink>();
 
                 List<XElement> hyperlink_elements =
@@ -156,7 +170,7 @@ namespace Novacode
                                         hyperlinks.Add(h);
                                     }
 
-                                    catch(Exception){}
+                                    catch (Exception) { }
 
                                     break;
                                 }
@@ -174,35 +188,35 @@ namespace Novacode
         ///</summary>
         public string StyleName
         {
-          get
-          {
-            var element = this.GetOrCreate_pPr();
-            var styleElement = element.Element(XName.Get("pStyle", DocX.w.NamespaceName));
-            if (styleElement != null)
+            get
             {
-              var attr = styleElement.Attribute(XName.Get("val", DocX.w.NamespaceName));
-              if (attr != null && !string.IsNullOrEmpty(attr.Value))
-              {
-                return attr.Value;
-              }
+                var element = this.GetOrCreate_pPr();
+                var styleElement = element.Element(XName.Get("pStyle", DocX.w.NamespaceName));
+                if (styleElement != null)
+                {
+                    var attr = styleElement.Attribute(XName.Get("val", DocX.w.NamespaceName));
+                    if (attr != null && !string.IsNullOrEmpty(attr.Value))
+                    {
+                        return attr.Value;
+                    }
+                }
+                return "Normal";
             }
-            return "Normal";
-          }
-          set
-          {
-            if (string.IsNullOrEmpty(value))
+            set
             {
-              value = "Normal";
+                if (string.IsNullOrEmpty(value))
+                {
+                    value = "Normal";
+                }
+                var element = this.GetOrCreate_pPr();
+                var styleElement = element.Element(XName.Get("pStyle", DocX.w.NamespaceName));
+                if (styleElement == null)
+                {
+                    element.Add(new XElement(XName.Get("pStyle", DocX.w.NamespaceName)));
+                    styleElement = element.Element(XName.Get("pStyle", DocX.w.NamespaceName));
+                }
+                styleElement.SetAttributeValue(XName.Get("val", DocX.w.NamespaceName), value);
             }
-            var element = this.GetOrCreate_pPr();
-            var styleElement = element.Element(XName.Get("pStyle", DocX.w.NamespaceName));
-            if (styleElement == null)
-            {
-              element.Add(new XElement(XName.Get("pStyle", DocX.w.NamespaceName)));
-              styleElement = element.Element(XName.Get("pStyle", DocX.w.NamespaceName));
-            }
-            styleElement.SetAttributeValue(XName.Get("val", DocX.w.NamespaceName), value);
-          }
         }
 
         // A collection of field type DocProperty.
@@ -218,7 +232,8 @@ namespace Novacode
             get { return docProperties; }
         }
 
-        internal Paragraph(DocX document, XElement xml, int startIndex, ContainerType parent = ContainerType.None):base(document, xml)
+        internal Paragraph(DocX document, XElement xml, int startIndex, ContainerType parent = ContainerType.None)
+            : base(document, xml)
         {
             ParentContainer = parent;
             this.startIndex = startIndex;
@@ -323,9 +338,9 @@ namespace Novacode
         /// </code>
         /// </example>
         /// </summary>
-        public Direction Direction 
+        public Direction Direction
         {
-            get 
+            get
             {
                 XElement pPr = GetOrCreate_pPr();
                 XElement bidi = pPr.Element(XName.Get("bidi", DocX.w.NamespaceName));
@@ -346,7 +361,7 @@ namespace Novacode
 
                 if (direction == Direction.RightToLeft)
                 {
-                    if(bidi == null)
+                    if (bidi == null)
                         pPr.Add(new XElement(XName.Get("bidi", DocX.w.NamespaceName)));
                 }
 
@@ -420,12 +435,12 @@ namespace Novacode
         /// }
         /// </code>
         /// </example>
-        public float IndentationFirstLine 
+        public float IndentationFirstLine
         {
-            get 
+            get
             {
                 XElement pPr = GetOrCreate_pPr();
-                XElement ind = GetOrCreate_pPr_ind();        
+                XElement ind = GetOrCreate_pPr_ind();
                 XAttribute firstLine = ind.Attribute(XName.Get("firstLine", DocX.w.NamespaceName));
 
                 if (firstLine != null)
@@ -433,7 +448,7 @@ namespace Novacode
 
                 return 0.0f;
             }
-            
+
             set
             {
                 if (IndentationFirstLine != value)
@@ -442,7 +457,7 @@ namespace Novacode
 
                     XElement pPr = GetOrCreate_pPr();
                     XElement ind = GetOrCreate_pPr_ind();
-                   
+
                     // Paragraph can either be firstLine or hanging (Remove hanging).
                     XAttribute hanging = ind.Attribute(XName.Get("hanging", DocX.w.NamespaceName));
                     if (hanging != null)
@@ -453,7 +468,7 @@ namespace Novacode
                     if (firstLine != null)
                         firstLine.Value = indentation;
                     else
-                        ind.Add(new XAttribute(XName.Get("firstLine", DocX.w.NamespaceName), indentation));    
+                        ind.Add(new XAttribute(XName.Get("firstLine", DocX.w.NamespaceName), indentation));
                 }
             }
         }
@@ -481,10 +496,10 @@ namespace Novacode
         /// </example>
         public float IndentationHanging
         {
-            get 
+            get
             {
                 XElement pPr = GetOrCreate_pPr();
-                XElement ind = GetOrCreate_pPr_ind();        
+                XElement ind = GetOrCreate_pPr_ind();
                 XAttribute hanging = ind.Attribute(XName.Get("hanging", DocX.w.NamespaceName));
 
                 if (hanging != null)
@@ -501,7 +516,7 @@ namespace Novacode
 
                     XElement pPr = GetOrCreate_pPr();
                     XElement ind = GetOrCreate_pPr_ind();
-                   
+
                     // Paragraph can either be firstLine or hanging (Remove firstLine).
                     XAttribute firstLine = ind.Attribute(XName.Get("firstLine", DocX.w.NamespaceName));
                     if (firstLine != null)
@@ -538,7 +553,7 @@ namespace Novacode
         ///}
         /// </code>
         /// </example>
-        public float IndentationBefore 
+        public float IndentationBefore
         {
             get
             {
@@ -551,7 +566,7 @@ namespace Novacode
 
                 return 0.0f;
             }
-            
+
             set
             {
                 if (IndentationBefore != value)
@@ -564,7 +579,7 @@ namespace Novacode
                     string indentation = ((indentationBefore / 0.1) * 57).ToString();
 
                     XAttribute left = ind.Attribute(XName.Get("left", DocX.w.NamespaceName));
-                    if(left != null)
+                    if (left != null)
                         left.Value = indentation;
                     else
                         ind.Add(new XAttribute(XName.Get("left", DocX.w.NamespaceName), indentation));
@@ -923,7 +938,7 @@ namespace Novacode
         /// This function was added by Brian Campbell aka chickendelicious on Jun 16 2010
         /// Thank you Brian.
         /// -->
-        public Paragraph InsertHyperlink(Hyperlink h, int index = 0) 
+        public Paragraph InsertHyperlink(Hyperlink h, int index = 0)
         {
             // Convert the path of this mainPart to its equilivant rels file path.
             string path = mainPart.Uri.OriginalString.Replace("/word/", "");
@@ -983,7 +998,7 @@ namespace Novacode
                 h_xml.SetAttributeValue(DocX.r + "id", Id);
             }
 
-            return this; 
+            return this;
         }
 
         /// <summary>
@@ -1190,14 +1205,14 @@ namespace Novacode
         /// <summary>
         /// Gets or set this Paragraphs text alignment.
         /// </summary>
-        public Alignment Alignment 
-        { 
-            get 
-            { 
+        public Alignment Alignment
+        {
+            get
+            {
                 XElement pPr = GetOrCreate_pPr();
                 XElement jc = pPr.Element(XName.Get("jc", DocX.w.NamespaceName));
 
-                if(jc != null)
+                if (jc != null)
                 {
                     XAttribute a = jc.Attribute(XName.Get("val", DocX.w.NamespaceName));
 
@@ -1209,11 +1224,11 @@ namespace Novacode
                         case "both": return Novacode.Alignment.both;
                     }
                 }
-                
+
                 return Novacode.Alignment.left;
             }
 
-            set 
+            set
             {
                 alignment = value;
 
@@ -1222,7 +1237,7 @@ namespace Novacode
 
                 if (alignment != Novacode.Alignment.left)
                 {
-                    if(jc == null)
+                    if (jc == null)
                         pPr.Add(new XElement(XName.Get("jc", DocX.w.NamespaceName), new XAttribute(XName.Get("val", DocX.w.NamespaceName), alignment.ToString())));
                     else
                         jc.Attribute(XName.Get("val", DocX.w.NamespaceName)).Value = alignment.ToString();
@@ -1230,10 +1245,10 @@ namespace Novacode
 
                 else
                 {
-                        if (jc != null)
-                            jc.Remove();
+                    if (jc != null)
+                        jc.Remove();
                 }
-            } 
+            }
         }
 
         /// <summary>
@@ -1265,7 +1280,7 @@ namespace Novacode
 
                 List<XElement> elements = Xml.Elements().ToList();
                 List<XElement> temp = new List<XElement>();
-                for (int i = 0; i < elements.Count(); i++ )
+                for (int i = 0; i < elements.Count(); i++)
                 {
                     XElement e = elements[i];
 
@@ -1286,7 +1301,7 @@ namespace Novacode
                 }
 
                 if (temp.Count() > 0)
-                    Xml.Add(CreateEdit(EditType.del, now, temp));                   
+                    Xml.Add(CreateEdit(EditType.del, now, temp));
             }
 
             else
@@ -1496,7 +1511,7 @@ namespace Novacode
         /// <param name="descr">The description of this Picture.</param>
         static internal Picture CreatePicture(DocX document, string id, string name, string descr)
         {
-           PackagePart part = document.package.GetPart(document.mainPart.GetRelationship(id).TargetUri);
+            PackagePart part = document.package.GetPart(document.mainPart.GetRelationship(id).TargetUri);
 
             int cx, cy;
 
@@ -1508,7 +1523,7 @@ namespace Novacode
 
             XElement e = new XElement(DocX.w + "drawing");
 
-            XElement xml = XElement.Parse 
+            XElement xml = XElement.Parse
             (string.Format(@"
             <drawing xmlns = ""http://schemas.openxmlformats.org/wordprocessingml/2006/main"">
                 <wp:inline distT=""0"" distB=""0"" distL=""0"" distR=""0"" xmlns:wp=""http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"">
@@ -1571,14 +1586,14 @@ namespace Novacode
                 {
                     if (o is XElement)
                     {
-                       XElement e = (o as XElement);
-                       IEnumerable<XElement> ts = e.DescendantsAndSelf(XName.Get("t", DocX.w.NamespaceName));
-                       
-                       for(int i = 0; i < ts.Count(); i ++)
-                       {
-                           XElement text = ts.ElementAt(i);
-                           text.ReplaceWith(new XElement(DocX.w + "delText", text.Attributes(), text.Value));  
-                       }
+                        XElement e = (o as XElement);
+                        IEnumerable<XElement> ts = e.DescendantsAndSelf(XName.Get("t", DocX.w.NamespaceName));
+
+                        for (int i = 0; i < ts.Count(); i++)
+                        {
+                            XElement text = ts.ElementAt(i);
+                            text.ReplaceWith(new XElement(DocX.w + "delText", text.Attributes(), text.Value));
+                        }
                     }
                 }
             }
@@ -1669,7 +1684,7 @@ namespace Novacode
             Run run = GetFirstRunEffectedByEdit(index, type);
 
             XElement[] splitRun = Run.SplitRun(run, index, type);
-            
+
             XElement splitLeft = new XElement(edit.Name, edit.Attributes(), run.Xml.ElementsBeforeSelf(), splitRun[0]);
             if (GetElementTextLength(splitLeft) == 0)
                 splitLeft = null;
@@ -1811,15 +1826,15 @@ namespace Novacode
         /// <param name="value">The System.String to insert.</param>
         /// <param name="trackChanges">Flag this insert as a change.</param>
         /// <param name="formatting">The text formatting.</param>
-        public void InsertText(int index, string value, bool trackChanges=false, Formatting formatting = null)
-        {                
+        public void InsertText(int index, string value, bool trackChanges = false, Formatting formatting = null)
+        {
             // Timestamp to mark the start of insert
             DateTime now = DateTime.Now;
             DateTime insert_datetime = new DateTime(now.Year, now.Month, now.Day, now.Hour, now.Minute, 0, DateTimeKind.Utc);
 
             // Get the first run effected by this Insert
             Run run = GetFirstRunEffectedByEdit(index);
-            
+
             if (run == null)
             {
                 object insert;
@@ -1827,7 +1842,7 @@ namespace Novacode
                     insert = HelperFunctions.FormatInput(value, formatting.Xml);
                 else
                     insert = HelperFunctions.FormatInput(value, null);
-                
+
                 if (trackChanges)
                     insert = CreateEdit(EditType.ins, insert_datetime, insert);
                 Xml.Add(insert);
@@ -2047,8 +2062,8 @@ namespace Novacode
             this.runs = Xml.Elements().Last().Elements(XName.Get("r", DocX.w.NamespaceName)).ToList();
 
             return this;
-        }     
-        
+        }
+
         /// <summary>
         /// Add an image to a document, create a custom view of that image (picture) and then insert it into a Paragraph using append.
         /// </summary>
@@ -2558,20 +2573,20 @@ namespace Novacode
 
         private Table followingTable;
 
-      ///<summary>
-      /// Returns table following the paragraph. Null if the following element isn't table.
-      ///</summary>
-      public Table FollowingTable
-      {
-        get
+        ///<summary>
+        /// Returns table following the paragraph. Null if the following element isn't table.
+        ///</summary>
+        public Table FollowingTable
         {
-          return followingTable;
+            get
+            {
+                return followingTable;
+            }
+            internal set
+            {
+                followingTable = value;
+            }
         }
-        internal set
-        {
-          followingTable = value;
-        }
-      }
 
         /// <summary>
         /// For use with Append() and AppendLine()
@@ -2606,7 +2621,7 @@ namespace Novacode
 
             else
                 throw new ArgumentException("Size", "Value must be either a whole or half number, examples: 32, 32.5");
-        
+
             ApplyTextFormattingProperty(XName.Get("sz", DocX.w.NamespaceName), string.Empty, new XAttribute(XName.Get("val", DocX.w.NamespaceName), fontSize * 2));
             ApplyTextFormattingProperty(XName.Get("szCs", DocX.w.NamespaceName), string.Empty, new XAttribute(XName.Get("val", DocX.w.NamespaceName), fontSize * 2));
 
@@ -2678,16 +2693,16 @@ namespace Novacode
         /// </example>
         public Paragraph CapsStyle(CapsStyle capsStyle)
         {
-            switch(capsStyle)
+            switch (capsStyle)
             {
                 case Novacode.CapsStyle.none:
                     break;
-                
-                default: 
-                {
-                    ApplyTextFormattingProperty(XName.Get(capsStyle.ToString(), DocX.w.NamespaceName), string.Empty, null);
-                    break;
-                }
+
+                default:
+                    {
+                        ApplyTextFormattingProperty(XName.Get(capsStyle.ToString(), DocX.w.NamespaceName), string.Empty, null);
+                        break;
+                    }
             }
 
             return this;
@@ -2724,10 +2739,10 @@ namespace Novacode
                     break;
 
                 default:
-                {
-                    ApplyTextFormattingProperty(XName.Get("vertAlign", DocX.w.NamespaceName), string.Empty, new XAttribute(XName.Get("val", DocX.w.NamespaceName), script.ToString()));
-                    break;
-                }
+                    {
+                        ApplyTextFormattingProperty(XName.Get("vertAlign", DocX.w.NamespaceName), string.Empty, new XAttribute(XName.Get("val", DocX.w.NamespaceName), script.ToString()));
+                        break;
+                    }
             }
 
             return this;
@@ -2764,10 +2779,10 @@ namespace Novacode
                     break;
 
                 default:
-                {
-                    ApplyTextFormattingProperty(XName.Get("highlight", DocX.w.NamespaceName), string.Empty, new XAttribute(XName.Get("val", DocX.w.NamespaceName), highlight.ToString()));
-                    break;
-                }
+                    {
+                        ApplyTextFormattingProperty(XName.Get("highlight", DocX.w.NamespaceName), string.Empty, new XAttribute(XName.Get("val", DocX.w.NamespaceName), highlight.ToString()));
+                        break;
+                    }
             }
 
             return this;
@@ -2804,26 +2819,26 @@ namespace Novacode
                     break;
 
                 case Novacode.Misc.outlineShadow:
-                {
-                    ApplyTextFormattingProperty(XName.Get("outline", DocX.w.NamespaceName), string.Empty, null);
-                    ApplyTextFormattingProperty(XName.Get("shadow", DocX.w.NamespaceName), string.Empty, null);
+                    {
+                        ApplyTextFormattingProperty(XName.Get("outline", DocX.w.NamespaceName), string.Empty, null);
+                        ApplyTextFormattingProperty(XName.Get("shadow", DocX.w.NamespaceName), string.Empty, null);
 
-                    break;
-                }
-                
+                        break;
+                    }
+
                 case Novacode.Misc.engrave:
-                {
-                    ApplyTextFormattingProperty(XName.Get("imprint", DocX.w.NamespaceName), string.Empty, null);
-                    
-                    break;
-                }
-                
+                    {
+                        ApplyTextFormattingProperty(XName.Get("imprint", DocX.w.NamespaceName), string.Empty, null);
+
+                        break;
+                    }
+
                 default:
-                {
-                    ApplyTextFormattingProperty(XName.Get(misc.ToString(), DocX.w.NamespaceName), string.Empty, null);
-                    
-                    break;
-                }
+                    {
+                        ApplyTextFormattingProperty(XName.Get(misc.ToString(), DocX.w.NamespaceName), string.Empty, null);
+
+                        break;
+                    }
             }
 
             return this;
@@ -2863,7 +2878,7 @@ namespace Novacode
             }
 
             ApplyTextFormattingProperty(XName.Get(value, DocX.w.NamespaceName), string.Empty, null);
-                    
+
             return this;
         }
 
@@ -2911,7 +2926,7 @@ namespace Novacode
 
                 u.SetAttributeValue(XName.Get("color", DocX.w.NamespaceName), underlineColor.ToHex());
             }
-            
+
             return this;
         }
 
@@ -2944,17 +2959,17 @@ namespace Novacode
             return this;
         }
 
-        public float LineSpacing 
+        public float LineSpacing
         {
             get
             {
                 XElement pPr = GetOrCreate_pPr();
                 XElement spacing = pPr.Element(XName.Get("spacing", DocX.w.NamespaceName));
 
-                if(spacing != null)
+                if (spacing != null)
                 {
                     XAttribute line = spacing.Attribute(XName.Get("line", DocX.w.NamespaceName));
-                    if(line != null)
+                    if (line != null)
                     {
                         float f;
 
@@ -2979,14 +2994,14 @@ namespace Novacode
             if (spacing - (int)spacing == 0)
             {
                 if (!(spacing > -1585 && spacing < 1585))
-                    throw new ArgumentException("Spacing", "Value must be in the range: -1584 - 1584");         
+                    throw new ArgumentException("Spacing", "Value must be in the range: -1584 - 1584");
             }
 
             else
                 throw new ArgumentException("Spacing", "Value must be either a whole or acurate to one decimal, examples: 32, 32.1, 32.2, 32.9");
-            
+
             ApplyTextFormattingProperty(XName.Get("spacing", DocX.w.NamespaceName), string.Empty, new XAttribute(XName.Get("val", DocX.w.NamespaceName), spacing));
-            
+
             return this;
         }
 
@@ -3213,10 +3228,10 @@ namespace Novacode
                             XElement temp = SplitEdit(splitEditBefore[1], index + min, EditType.del)[0];
                             object middle = CreateEdit(EditType.del, remove_datetime, temp.Elements());
                             processed += GetElementTextLength(middle as XElement);
-                            
+
                             if (!trackChanges)
                                 middle = null;
-                                
+
                             parentElement.ReplaceWith
                             (
                                 splitEditBefore[0],
@@ -3250,7 +3265,7 @@ namespace Novacode
 
                             object middle = CreateEdit(EditType.del, remove_datetime, new List<XElement>() { Run.SplitRun(new Run(Document, splitRunBefore[1], run.StartIndex + GetElementTextLength(splitRunBefore[0])), min, EditType.del)[0] });
                             processed += GetElementTextLength(middle as XElement);
-                            
+
                             if (!trackChanges)
                                 middle = null;
 
@@ -3386,7 +3401,7 @@ namespace Novacode
                     {
                         // Get the next run effected
                         Run run = GetFirstRunEffectedByEdit(m.Index + processed);
-                        
+
                         // Get this runs properties
                         XElement rPr = run.Xml.Element(XName.Get("rPr", DocX.w.NamespaceName));
 
@@ -3410,7 +3425,7 @@ namespace Novacode
                 }
 
                 // If the formatting matches, do the replace.
-                if(formattingMatch)
+                if (formattingMatch)
                 {
                     InsertText(m.Index + oldValue.Length, newValue, trackChanges, newFormatting);
                     RemoveText(m.Index, m.Length, trackChanges);
@@ -3647,8 +3662,8 @@ namespace Novacode
         public void AppendPageNumber(PageNumberFormat pnf)
         {
             XElement fldSimple = new XElement(XName.Get("fldSimple", DocX.w.NamespaceName));
-            
-            if(pnf == PageNumberFormat.normal)
+
+            if (pnf == PageNumberFormat.normal)
                 fldSimple.Add(new XAttribute(XName.Get("instr", DocX.w.NamespaceName), @" PAGE   \* MERGEFORMAT "));
             else
                 fldSimple.Add(new XAttribute(XName.Get("instr", DocX.w.NamespaceName), @" PAGE  \* ROMAN  \* MERGEFORMAT "));
@@ -3794,8 +3809,8 @@ namespace Novacode
             Xml.Add(fldSimple);
         }
 
-        public float LineSpacingBefore 
-        { 
+        public float LineSpacingBefore
+        {
             get
             {
                 XElement pPr = GetOrCreate_pPr();
@@ -3815,11 +3830,11 @@ namespace Novacode
 
                 return 0.0f;
             }
-            
+
             set
             {
                 SpacingBefore(value);
-            } 
+            }
         }
 
         public float LineSpacingAfter
