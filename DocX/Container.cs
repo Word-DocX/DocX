@@ -220,16 +220,16 @@ namespace Novacode
                 {
                     if (paragraph.IsListItem)
                     {
-                      if (list.CanAddListItem(paragraph))
-                      {
-                        list.AddItem(paragraph);
-                      }
-                    else
-                      {
-                        lists.Add(list);
-                        list = new List(Document, Xml);
-                        list.AddItem(paragraph);
-                      }
+                        if (list.CanAddListItem(paragraph))
+                        {
+                            list.AddItem(paragraph);
+                        }
+                        else
+                        {
+                            lists.Add(list);
+                            list = new List(Document, Xml);
+                            list.AddItem(paragraph);
+                        }
                     }
                 }
 

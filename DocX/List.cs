@@ -74,7 +74,6 @@ namespace Novacode
                 var numIdNode = paragraph.Xml.Descendants().First(s => s.Name.LocalName == "numId");
                 var numId = Int32.Parse(numIdNode.Attribute(DocX.w + "val").Value);
 
-                //Level = Int32.Parse(lvlNode.Attribute(DocX.w + "val").Value);
                 if (NumId == 0 || (numId == NumId && numId > 0))
                 {
                     return true;

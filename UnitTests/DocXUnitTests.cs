@@ -1239,7 +1239,8 @@ namespace UnitTests
                 using (DocX document = DocX.Create(documentStream))
                 {
                     document.ApplyTemplate(directory_documents + "Template.dotx");
-                    document.Save();
+                    //document.Save();
+
                     Header firstHeader = document.Headers.first;
                     Header oddHeader = document.Headers.odd;
                     Header evenHeader = document.Headers.even;
