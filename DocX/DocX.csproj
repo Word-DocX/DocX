@@ -105,7 +105,6 @@
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="Hyperlink.cs" />
     <Compile Include="List.cs" />
-    <Compile Include="ListItem.cs" />
     <Compile Include="PageLayout.cs" />
     <Compile Include="Section.cs" />
     <Compile Include="_BaseClasses.cs" />

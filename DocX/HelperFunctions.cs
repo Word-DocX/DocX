@@ -448,7 +448,7 @@ namespace Novacode
                     );
         }
 
-        internal static List CreateItemInList(List list, string listText, int level = 0, ListItemType listType = ListItemType.Numbered, bool trackChanges = false)
+        internal static List CreateItemInList(List list, string listText, int level = 0, ListItemType listType = ListItemType.Numbered, int? startNumber = null, bool trackChanges = false)
         {
             if (list.NumId == 0)
             {
@@ -466,9 +466,16 @@ namespace Novacode
               );
 
             if (trackChanges)
-                newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+                newParagraphSection = CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
 
-            list.AddItem(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph));
+            if (startNumber == null)
+            {
+                list.AddItem(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph));
+            }
+            else
+            {
+                list.AddItemWithStartValue(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph), (int)startNumber);
+            }
 
             return list;
         }

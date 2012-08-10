@@ -44,11 +44,9 @@ namespace Novacode
         {
             if (paragraph.IsListItem)
             {
-                //var lvlNode = paragraph.Xml.Descendants().First(s => s.Name.LocalName == "ilvl");
                 var numIdNode = paragraph.Xml.Descendants().First(s => s.Name.LocalName == "numId");
                 var numId = Int32.Parse(numIdNode.Attribute(DocX.w + "val").Value);
 
-                //Level = Int32.Parse(lvlNode.Attribute(DocX.w + "val").Value);
                 if (CanAddListItem(paragraph))
                 {
                     NumId = numId;
@@ -59,6 +57,21 @@ namespace Novacode
             }
         }
 
+        public void AddItemWithStartValue(Paragraph paragraph, int start)
+        {
+            //TODO: Update the numbering
+            UpdateNumberingForLevelStartNumber(int.Parse(paragraph.IndentLevel.ToString()), start);
+            if (ContainsLevel(start))
+                throw new InvalidOperationException("Cannot add a paragraph with a start value if another element already exists in this list with that level.");
+            AddItem(paragraph);
+        }
+
+        private void UpdateNumberingForLevelStartNumber(int iLevel, int start)
+        {
+            var abstractNum = GetAbstractNum(NumId);
+            var level = abstractNum.Descendants().First(el => el.Name.LocalName == "lvl" && el.GetAttribute(DocX.w + "ilvl") == iLevel.ToString());
+            level.Descendants().First(el => el.Name.LocalName == "start").SetAttributeValue(DocX.w + "val", start);
+        }
 
         /// <summary>
         /// Determine if it is able to add the item to the list
@@ -71,15 +84,22 @@ namespace Novacode
         {
             if (paragraph.IsListItem)
             {
+                //var lvlNode = paragraph.Xml.Descendants().First(s => s.Name.LocalName == "ilvl");
                 var numIdNode = paragraph.Xml.Descendants().First(s => s.Name.LocalName == "numId");
                 var numId = Int32.Parse(numIdNode.Attribute(DocX.w + "val").Value);
 
+                //Level = Int32.Parse(lvlNode.Attribute(DocX.w + "val").Value);
                 if (NumId == 0 || (numId == NumId && numId > 0))
                 {
                     return true;
                 }
             }
             return false;
+        }
+
+        public bool ContainsLevel(int ilvl)
+        {
+            return Items.Any(i => i.ParagraphNumberProperties.Descendants().First(el => el.Name.LocalName == "ilvl").Value == ilvl.ToString());
         }
 
         internal void CreateNewNumberingNumId(int level = 0, ListItemType listType = ListItemType.Numbered)

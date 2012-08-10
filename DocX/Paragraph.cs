@@ -28,22 +28,50 @@ namespace Novacode
 
         public ContainerType ParentContainer;
 
-        private XElement ParagraphNumberProperties_Backer { get; set; }
+        private XElement ParagraphNumberPropertiesBacker { get; set; }
+        /// <summary>
+        /// Fetch the paragraph number properties for a list element.
+        /// </summary>
         public XElement ParagraphNumberProperties
         {
             get
             {
-                return ParagraphNumberProperties_Backer ?? (ParagraphNumberProperties_Backer = Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr"));
+                return ParagraphNumberPropertiesBacker ?? (ParagraphNumberPropertiesBacker = Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr"));
             }
         }
+
+        private bool? IsListItemBacker { get; set; }
+        /// <summary>
+        /// Determine if this paragraph is a list element.
+        /// </summary>
         public bool IsListItem
         {
             get
             {
-                return ParagraphNumberProperties != null;
+                IsListItemBacker = IsListItemBacker ?? (ParagraphNumberProperties != null);
+                return (bool)IsListItemBacker;
             }
         }
 
+        private int? IndentLevelBacker { get; set; }
+        /// <summary>
+        /// If this element is a list item, get the indentation level of the list item.
+        /// </summary>
+        public int? IndentLevel
+        {
+            get
+            {
+                if (!IsListItem)
+                {
+                    return null;
+                }
+                return IndentLevelBacker ?? (IndentLevelBacker = int.Parse(ParagraphNumberProperties.Descendants().First(el => el.Name.LocalName == "ilvl").GetAttribute(DocX.w + "val")));
+            }
+        }
+
+        /// <summary>
+        /// Determine if the list element is a numbered list of bulleted list element
+        /// </summary>
         public ListItemType ListItemType;
 
         internal int startIndex, endIndex;

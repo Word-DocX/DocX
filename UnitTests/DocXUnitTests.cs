@@ -1539,6 +1539,12 @@ namespace UnitTests
         }
 
         [TestMethod]
+        public void WhenCreatingAListTheNumberingShouldGetSaved()
+        {
+
+        }
+
+        [TestMethod]
         public void WhenCreatingAListTheListStyleShouldExistOrBeCreated()
         {
 
@@ -1663,7 +1669,20 @@ namespace UnitTests
             }
         }
 
+        [TestMethod]
+        public void WhenADocumentIsCreatedWithAListItemThatHasASpecifiedStartNumber()
+        {
+            using (DocX document = DocX.Create("CreateListItemFromDifferentStartValue.docx"))
+            {
+                var list = document.AddList("Test", 0, ListItemType.Numbered, 5);
+                document.AddListItem(list, "NewElement");
 
+                var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
+                var level = numbering.Descendants().First(el => el.Name.LocalName == "lvl");
+                var start = level.Descendants().First(el => el.Name.LocalName == "start");
+                Assert.AreEqual(start.GetAttribute(DocX.w + "val"), 5.ToString());
+            }
+        }
 
     }
 }
