@@ -1539,12 +1539,6 @@ namespace UnitTests
         }
 
         [TestMethod]
-        public void WhenCreatingAListTheNumberingShouldGetSaved()
-        {
-
-        }
-
-        [TestMethod]
         public void WhenCreatingAListTheListStyleShouldExistOrBeCreated()
         {
 
