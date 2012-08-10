@@ -2518,6 +2518,7 @@ namespace Novacode
                     tr.Read();
                 }
                 templatePackage.Close();
+                PopulateDocument(Document, package);
             }
         }
 
