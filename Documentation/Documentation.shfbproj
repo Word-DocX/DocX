@@ -38,10 +38,14 @@
     <DocumentationSources>
       <DocumentationSource sourceFile="..\DocX\DocX.csproj" />
     </DocumentationSources>
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
+    <SccProjectName>
+    </SccProjectName>
+    <SccProvider>
+    </SccProvider>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccLocalPath>
+    </SccLocalPath>
     <WorkingPath>%temp%\</WorkingPath>
   </PropertyGroup>
   <!-- There are no properties for these groups.  AnyCPU needs to appear in
