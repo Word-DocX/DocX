@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -160,7 +159,7 @@ namespace Novacode
 
             var numlist = Document.numbering.Descendants().Where(d => d.Name.LocalName == "num").ToList();
             if (numlist.Any())
-                return numlist.Max(e => int.Parse(e.Value));
+                return numlist.Attributes(DocX.w + "numId").Max(e => int.Parse(e.Value));
             return defaultValue;
         }
 
@@ -181,7 +180,10 @@ namespace Novacode
 
             var numlist = Document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum").ToList();
             if (numlist.Any())
-                return numlist.Max(e => int.Parse(e.Value));
+            {
+                var maxAbstractNumId = numlist.Attributes(DocX.w + "abstractNumId").Max(e => int.Parse(e.Value));
+                return maxAbstractNumId;
+            }
             return defaultValue;
         }
 
@@ -203,13 +205,7 @@ namespace Novacode
 
             // If the internal document contains no /word/numbering.xml create one.
             if (!Document.package.PartExists(numberingUri))
-                HelperFunctions.AddDefaultNumberingXml(Document.package);
-
-            //XDocument numbering;
-            using (TextReader tr = new StreamReader(Document.package.GetPart(numberingUri).GetStream()))
-            {
-                Document.numbering = XDocument.Load(tr);
-            }
+                Document.numbering = HelperFunctions.AddDefaultNumberingXml(Document.package);
         }
     }
 }

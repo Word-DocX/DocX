@@ -1701,15 +1701,16 @@ namespace Novacode
         /// <param name="listText">The text of the first element in the created list.</param>
         /// <param name="level">The indentation level of the element in the list.</param>
         /// <param name="listType">The type of list to be created: Bulleted or Numbered.</param>
+        /// <param name="startNumber">The number start number for the list. </param>
         /// <param name="trackChanges">Enable change tracking</param>
         /// <returns>
         /// The created List. Call AddListItem(...) to add more elements to the list.
         /// Write the list to the Document with InsertList(...) once the list has all the desired 
         /// elements, otherwise the list will not be included in the working Document.
         /// </returns>
-        public List AddList(string listText, int level = 0, ListItemType listType = ListItemType.Bulleted, int? startNumber = null, bool trackChanges = false)
+        public List AddList(string listText, int level = 0, ListItemType listType = ListItemType.Numbered, int? startNumber = null, bool trackChanges = false)
         {
-            return AddListItem(new List(Document, null), listText, level, listType, startNumber, trackChanges);
+            return AddListItem(new List(this, null), listText, level, listType, startNumber, trackChanges);
         }
 
         /// <summary>
@@ -1718,7 +1719,9 @@ namespace Novacode
         /// <param name="list">The list to add the new list item to.</param>
         /// <param name="listText">The run text that should be in the new list item.</param>
         /// <param name="level">The indentation level of the new list element.</param>
+        /// <param name="startNumber">The number start number for the list. </param>
         /// <param name="trackChanges">Enable change tracking</param>
+        /// <param name="listType">Numbered or Bulleted list type. </param>
         /// <returns>
         /// The created List. Call AddListItem(...) to add more elements to the list.
         /// Write the list to the Document with InsertList(...) once the list has all the desired 

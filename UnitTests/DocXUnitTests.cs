@@ -1469,7 +1469,7 @@ namespace UnitTests
 
             using (DocX document = DocX.Create("TestListXmlBullet.docx"))
             {
-                var list = document.AddList("First Item");
+                var list = document.AddList("First Item", 0, ListItemType.Bulleted);
                 document.InsertList(list);
 
                 var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
@@ -1486,7 +1486,7 @@ namespace UnitTests
             using (DocX document = DocX.Create("TestListCreate.docx"))
             {
                 const string listText = "RunText";
-                var list = document.AddList(listText);
+                var list = document.AddList(listText, 0, ListItemType.Bulleted);
                 document.InsertList(list);
 
                 var listNumPropNode = document.mainDoc.Descendants().First(s => s.Name.LocalName == "numPr");
@@ -1505,7 +1505,7 @@ namespace UnitTests
 
             using (DocX document = DocX.Create("TestListCreateOrderedList.docx"))
             {
-                var list = document.AddList("First Item", 0, ListItemType.Numbered);
+                var list = document.AddList("First Item");
 
                 Assert.AreEqual(list.ListType, ListItemType.Numbered);
             }
@@ -1518,7 +1518,7 @@ namespace UnitTests
 
             using (DocX document = DocX.Create("TestListCreateUnorderedList.docx"))
             {
-                var list = document.AddList("First Item");
+                var list = document.AddList("First Item", 0, ListItemType.Bulleted);
 
                 Assert.AreEqual(list.ListType, ListItemType.Bulleted);
             }
@@ -1531,7 +1531,7 @@ namespace UnitTests
 
             using (DocX document = DocX.Create("TestListCreateRunText.docx"))
             {
-                var list = document.AddList("RunText");
+                var list = document.AddList("RunText", 0, ListItemType.Bulleted);
                 document.InsertList(list);
 
                 Assert.AreEqual(list.Items.First().runs.First().Value, "RunText");
@@ -1575,7 +1575,7 @@ namespace UnitTests
                 var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
                 Assert.IsFalse(numbering.Any());
 
-                document.AddList("List Text", 0, ListItemType.Numbered);
+                document.AddList("List Text");
 
                 numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
                 Assert.IsTrue(numbering.Any());
@@ -1590,7 +1590,7 @@ namespace UnitTests
                 var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
                 Assert.IsFalse(numbering.Any());
 
-                document.AddList("List Text", 0, ListItemType.Numbered);
+                document.AddList("List Text");
 
                 numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
                 Assert.IsTrue(numbering.Any());
@@ -1604,7 +1604,7 @@ namespace UnitTests
             {
                 var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
                 Assert.IsFalse(numbering.Any());
-                var list = document.AddList("");
+                var list = document.AddList("", 0, ListItemType.Bulleted);
                 document.InsertList(list);
 
                 numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "num");
@@ -1619,7 +1619,7 @@ namespace UnitTests
             {
                 var numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
                 Assert.IsFalse(numbering.Any());
-                var list = document.AddList("");
+                var list = document.AddList("", 0, ListItemType.Bulleted);
                 document.InsertList(list);
 
                 numbering = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
@@ -1632,7 +1632,7 @@ namespace UnitTests
         {
             using (DocX document = DocX.Create("TestAddListToPreviousList.docx"))
             {
-                var list = document.AddList("List Text", 0, ListItemType.Numbered);
+                var list = document.AddList("List Text");
                 document.AddListItem(list, "List Text2");
                 document.InsertList(list);
 
@@ -1684,5 +1684,24 @@ namespace UnitTests
             }
         }
 
+        [TestMethod]
+        public void WhenANumberedAndBulletedListIsCreatedThereShouldBeTwoNumberingXmls()
+        {
+            using (DocX document = DocX.Create("NumberAndBulletListInOne.docx"))
+            {
+                var numberList = document.AddList("Test");
+                document.AddListItem(numberList, "Second Numbered Item");
+
+                var bulletedList = document.AddList("Bullet", 0, ListItemType.Bulleted);
+                document.AddListItem(bulletedList, "Second bullet item");
+
+                document.InsertList(numberList);
+                document.InsertList(bulletedList);
+
+                var abstractNums = document.numbering.Descendants().Where(d => d.Name.LocalName == "abstractNum");
+                Assert.AreEqual(abstractNums.Count(), 2);
+
+            }
+        }
     }
 }
