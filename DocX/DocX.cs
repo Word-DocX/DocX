@@ -1708,7 +1708,7 @@ namespace Novacode
         /// Write the list to the Document with InsertList(...) once the list has all the desired 
         /// elements, otherwise the list will not be included in the working Document.
         /// </returns>
-        public List AddList(string listText, int level = 0, ListItemType listType = ListItemType.Numbered, int? startNumber = null, bool trackChanges = false)
+        public List AddList(string listText = null, int level = 0, ListItemType listType = ListItemType.Numbered, int? startNumber = null, bool trackChanges = false)
         {
             return AddListItem(new List(this, null), listText, level, listType, startNumber, trackChanges);
         }

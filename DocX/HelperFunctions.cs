@@ -455,26 +455,29 @@ namespace Novacode
                 list.CreateNewNumberingNumId(level, listType);
             }
 
-            var newParagraphSection = new XElement
-              (
-              XName.Get("p", DocX.w.NamespaceName),
-              new XElement(XName.Get("pPr", DocX.w.NamespaceName),
-                           new XElement(XName.Get("numPr", DocX.w.NamespaceName),
-                                        new XElement(XName.Get("ilvl", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", level)),
-                                        new XElement(XName.Get("numId", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", list.NumId)))),
-             new XElement(XName.Get("r", DocX.w.NamespaceName), new XElement(XName.Get("t", DocX.w.NamespaceName), listText))
-              );
-
-            if (trackChanges)
-                newParagraphSection = CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
-
-            if (startNumber == null)
+            if (!string.IsNullOrEmpty(listText))
             {
-                list.AddItem(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph));
-            }
-            else
-            {
-                list.AddItemWithStartValue(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph), (int)startNumber);
+                var newParagraphSection = new XElement
+                    (
+                    XName.Get("p", DocX.w.NamespaceName),
+                    new XElement(XName.Get("pPr", DocX.w.NamespaceName),
+                                 new XElement(XName.Get("numPr", DocX.w.NamespaceName),
+                                              new XElement(XName.Get("ilvl", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", level)),
+                                              new XElement(XName.Get("numId", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", list.NumId)))),
+                    new XElement(XName.Get("r", DocX.w.NamespaceName), new XElement(XName.Get("t", DocX.w.NamespaceName), listText))
+                    );
+
+                if (trackChanges)
+                    newParagraphSection = CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+
+                if (startNumber == null)
+                {
+                    list.AddItem(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph));
+                }
+                else
+                {
+                    list.AddItemWithStartValue(new Paragraph(list.Document, newParagraphSection, 0, ContainerType.Paragraph), (int)startNumber);
+                }
             }
 
             return list;

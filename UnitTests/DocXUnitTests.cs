@@ -1703,5 +1703,19 @@ namespace UnitTests
 
             }
         }
+
+        [TestMethod]
+        public void WhenICreateAnEmptyListAndAddEntriesToIt()
+        {
+            using (DocX document = DocX.Create("CreateEmptyListAndAddItemsToIt.docx"))
+            {
+                var list = document.AddList();
+                Assert.AreEqual(list.Items.Count, 0);
+
+                document.AddListItem(list, "Test item 1.");
+                document.AddListItem(list, "Test item 2.");
+                Assert.AreEqual(list.Items.Count, 2);
+            }
+        }
     }
 }
