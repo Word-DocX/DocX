@@ -1717,5 +1717,16 @@ namespace UnitTests
                 Assert.AreEqual(list.Items.Count, 2);
             }
         }
+
+        [TestMethod]
+        public void WhenICreateAHeaderItShouldHaveAStyle()
+        {
+            using (var document = DocX.Create("CreateHeaderElement.docx"))
+            {
+                document.InsertParagraph("Header Text 1").StyleName = "Header1";
+                Assert.IsNotNull(document.styles.Root.Descendants().FirstOrDefault(d => d.GetAttribute(DocX.w + "styleId").ToLowerInvariant() == "heading1"));
+                document.Save();
+            }
+        }
     }
 }
