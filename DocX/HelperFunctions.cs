@@ -635,5 +635,51 @@ namespace Novacode
 
             return ((file1byte - file2byte) == 0);
         }
+
+      internal static UnderlineStyle GetUnderlineStyle(string underlineStyle)
+      {
+        switch (underlineStyle)
+        {
+          case "single":
+            return UnderlineStyle.singleLine;
+          case "double": 
+            return UnderlineStyle.doubleLine;
+          case "thick":
+            return UnderlineStyle.thick;
+          case "dotted":
+            return UnderlineStyle.dotted;
+          case "dottedHeavy":
+            return UnderlineStyle.dottedHeavy;
+          case "dash":
+            return UnderlineStyle.dash;
+          case "dashedHeavy":
+            return UnderlineStyle.dashedHeavy;
+          case "dashLong":
+            return UnderlineStyle.dashLong;
+          case "dashLongHeavy":
+            return UnderlineStyle.dashLongHeavy;
+          case "dotDash":
+            return UnderlineStyle.dotDash;
+          case "dashDotHeavy":
+            return UnderlineStyle.dashDotHeavy;
+          case "dotDotDash":
+            return UnderlineStyle.dotDotDash;
+          case "dashDotDotHeavy":
+            return UnderlineStyle.dashDotDotHeavy;
+          case "wave":
+            return UnderlineStyle.wave;
+          case "wavyHeavy":
+            return UnderlineStyle.wavyHeavy;
+          case "wavyDouble":
+            return UnderlineStyle.wavyDouble;
+          case "words":
+            return UnderlineStyle.words;
+          default: 
+            return UnderlineStyle.none;
+        }
+      }
+
+
+
     }
 }

@@ -1728,5 +1728,22 @@ namespace UnitTests
                 document.Save();
             }
         }
+
+
+      [TestMethod]
+      public void WhenTextIsBoldItalicUnderlineItShouldReadTheProperFormatting()
+      {
+        using (DocX document = DocX.Load(directory_documents + "FontFormat.docx"))
+        {
+          var underlinedTextFormatting = document.Paragraphs[0].MagicText[0].formatting;
+          var boldTextFormatting = document.Paragraphs[0].MagicText[2].formatting;
+          var italicTextFormatting = document.Paragraphs[0].MagicText[4].formatting;
+
+          Assert.IsTrue(boldTextFormatting.Bold);
+          Assert.IsTrue(italicTextFormatting.Italic);
+          Assert.AreEqual(underlinedTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
+        }
+      }
+
     }
 }
