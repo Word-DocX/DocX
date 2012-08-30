@@ -128,17 +128,23 @@ namespace Novacode
             }
             var abstractNumTemplate = listTemplate.Descendants().Single(d => d.Name.LocalName == "abstractNum");
             abstractNumTemplate.SetAttributeValue(DocX.w + "abstractNumId", abstractNumId);
+            var abstractNumXml = new XElement(XName.Get("num", DocX.w.NamespaceName), new XAttribute(DocX.w + "numId", numId), new XElement(XName.Get("abstractNumId", DocX.w.NamespaceName), new XAttribute(DocX.w + "val", abstractNumId)));
 
+            var abstractNumNode = Document.numbering.Root.Descendants().LastOrDefault(xElement => xElement.Name.LocalName == "abstractNum");
+            var numXml = Document.numbering.Root.Descendants().LastOrDefault(xElement => xElement.Name.LocalName == "num");
 
-            Document.numbering.Root.Add(abstractNumTemplate);
-            Document.numbering.Root.Add(
-                new XElement(
-                    XName.Get("num", DocX.w.NamespaceName),
-                    new XAttribute(DocX.w + "numId", numId),
-                    new XElement(XName.Get("abstractNumId", DocX.w.NamespaceName),
-                                    new XAttribute(DocX.w + "val", abstractNumId))
-                )
-            );
+            if (abstractNumNode == null || numXml == null)
+            {
+                Document.numbering.Root.Add(abstractNumTemplate);
+                Document.numbering.Root.Add(abstractNumXml);
+            }
+            else
+            {
+                abstractNumNode.AddAfterSelf(abstractNumTemplate);
+                numXml.AddAfterSelf(
+                    abstractNumXml
+                );
+            }
 
             NumId = numId;
         }
