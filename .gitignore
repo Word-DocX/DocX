@@ -57,5 +57,7 @@ TestResult.xml
 additional_binds.yml
 TestResults/
 DocX/Resources/numberings/
+DocX/Resources/styles/
+DocX/Resources/default_styles/
 *.chm
 *.shfbproj_*
