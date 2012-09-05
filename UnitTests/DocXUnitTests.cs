@@ -1730,50 +1730,81 @@ namespace UnitTests
         }
 
 
-      [TestMethod]
-      public void WhileReadingWhenTextIsBoldItalicUnderlineItShouldReadTheProperFormatting()
-      {
-        using (DocX document = DocX.Load(directory_documents + "FontFormat.docx"))
+        [TestMethod]
+        public void WhileReadingWhenTextIsBoldItalicUnderlineItShouldReadTheProperFormatting()
         {
-          var underlinedTextFormatting = document.Paragraphs[0].MagicText[0].formatting;
-          var boldTextFormatting = document.Paragraphs[0].MagicText[2].formatting;
-          var italicTextFormatting = document.Paragraphs[0].MagicText[4].formatting;
-          var boldItalicUnderlineTextFormatting = document.Paragraphs[0].MagicText[6].formatting;
+            using (DocX document = DocX.Load(directory_documents + "FontFormat.docx"))
+            {
+                var underlinedTextFormatting = document.Paragraphs[0].MagicText[0].formatting;
+                var boldTextFormatting = document.Paragraphs[0].MagicText[2].formatting;
+                var italicTextFormatting = document.Paragraphs[0].MagicText[4].formatting;
+                var boldItalicUnderlineTextFormatting = document.Paragraphs[0].MagicText[6].formatting;
 
-          Assert.IsTrue(boldTextFormatting.Bold);
-          Assert.IsTrue(italicTextFormatting.Italic);
-          Assert.AreEqual(underlinedTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
-          Assert.IsTrue(boldItalicUnderlineTextFormatting.Bold);
-          Assert.IsTrue(boldItalicUnderlineTextFormatting.Italic);
-          Assert.AreEqual(boldItalicUnderlineTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
+                Assert.IsTrue(boldTextFormatting.Bold);
+                Assert.IsTrue(italicTextFormatting.Italic);
+                Assert.AreEqual(underlinedTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
+                Assert.IsTrue(boldItalicUnderlineTextFormatting.Bold);
+                Assert.IsTrue(boldItalicUnderlineTextFormatting.Italic);
+                Assert.AreEqual(boldItalicUnderlineTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
+            }
         }
-      }
 
 
-      [TestMethod]
-      public void WhileWritingWhenTextIsBoldItalicUnderlineItShouldReadTheProperFormatting()
-      {
-        using (DocX document = DocX.Create("FontFormatWrite.docx"))
+        [TestMethod]
+        public void WhileWritingWhenTextIsBoldItalicUnderlineItShouldReadTheProperFormatting()
         {
+            using (DocX document = DocX.Create("FontFormatWrite.docx"))
+            {
 
-          Paragraph p = document.InsertParagraph();
-          p.Append("This is bold.").Bold().Append("This is underlined.").UnderlineStyle(UnderlineStyle.singleLine).
-            Append("This is italic.").Italic().Append("This is boldItalicUnderlined").Italic().Bold().UnderlineStyle(UnderlineStyle.singleLine);
+                Paragraph p = document.InsertParagraph();
+                p.Append("This is bold.").Bold().Append("This is underlined.").UnderlineStyle(UnderlineStyle.singleLine).
+                Append("This is italic.").Italic().Append("This is boldItalicUnderlined").Italic().Bold().UnderlineStyle(UnderlineStyle.singleLine);
 
-          var boldTextFormatting = document.Paragraphs[0].MagicText[0].formatting;
-          var underlinedTextFormatting = document.Paragraphs[0].MagicText[1].formatting;
-          var italicTextFormatting = document.Paragraphs[0].MagicText[2].formatting;
-          var boldItalicUnderlineTextFormatting = document.Paragraphs[0].MagicText[3].formatting;
+                var boldTextFormatting = document.Paragraphs[0].MagicText[0].formatting;
+                var underlinedTextFormatting = document.Paragraphs[0].MagicText[1].formatting;
+                var italicTextFormatting = document.Paragraphs[0].MagicText[2].formatting;
+                var boldItalicUnderlineTextFormatting = document.Paragraphs[0].MagicText[3].formatting;
 
-          Assert.IsTrue(boldTextFormatting.Bold);
-          Assert.IsTrue(italicTextFormatting.Italic);
-          Assert.AreEqual(underlinedTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
-          Assert.IsTrue(boldItalicUnderlineTextFormatting.Bold);
-          Assert.IsTrue(boldItalicUnderlineTextFormatting.Italic);
-          Assert.AreEqual(boldItalicUnderlineTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
+                Assert.IsTrue(boldTextFormatting.Bold);
+                Assert.IsTrue(italicTextFormatting.Italic);
+                Assert.AreEqual(underlinedTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
+                Assert.IsTrue(boldItalicUnderlineTextFormatting.Bold);
+                Assert.IsTrue(boldItalicUnderlineTextFormatting.Italic);
+                Assert.AreEqual(boldItalicUnderlineTextFormatting.UnderlineStyle, UnderlineStyle.singleLine);
+            }
         }
-      }
 
+        [TestMethod]
+        public void InsertingANextPageBreakShouldAddADocumentSection()
+        {
+            using (DocX document = DocX.Create("SectionPageBreak.docx"))
+            {
+                document.InsertSectionPageBreak();
 
+                var sections = document.GetSections();
+                Assert.AreEqual(sections.Count, 2);
+                document.Save();
+            }
+        }
+
+        [TestMethod]
+        public void InsertANextPageBreakWithParagraphTextsShouldAddProperParagraphsToProperSections()
+        {
+            using (DocX document = DocX.Create("SectionPageBreakWithParagraphs.docx"))
+            {
+                document.InsertParagraph("First paragraph.");
+                document.InsertParagraph("Second paragraph.");
+                document.InsertSectionPageBreak();
+                document.InsertParagraph("Third paragraph.");
+                document.InsertParagraph("Fourth paragraph.");
+
+                var sections = document.GetSections();
+                Assert.AreEqual(sections.Count, 2);
+
+                Assert.AreEqual(sections[0].SectionParagraphs.Count(p => !string.IsNullOrWhiteSpace(p.Text)), 2);
+                Assert.AreEqual(sections[1].SectionParagraphs.Count(p => !string.IsNullOrWhiteSpace(p.Text)), 2);
+                document.Save();
+            }
+        }
     }
 }
