@@ -420,6 +420,20 @@ namespace Examples
                 Paragraph p8 = document.InsertParagraph();
                 p8.AppendLine("Hello Third page.");
 
+                //Insert a next page break, which is a section break combined with a page break
+                document.InsertSectionPageBreak();
+
+                //Insert a paragraph after the "Next" page break
+                Paragraph p9 = document.InsertParagraph();
+                p9.Append("Next page section break.");
+
+                //Insert a continuous section break
+                document.InsertSection();
+
+                //Create a paragraph in the new section
+                var p10 = document.InsertParagraph();
+                p10.Append("Continuous section paragraph.");
+
                 // Save all changes to this document.
                 document.Save();
 
