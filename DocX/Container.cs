@@ -615,13 +615,23 @@ namespace Novacode
                 newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
 
             Xml.Add(newParagraphSection);
-
         }
 
+        public virtual void InsertSectionPageBreak(bool trackChanges = false)
+        {
+            var newParagraphSection = new XElement
+            (
+                XName.Get("p", DocX.w.NamespaceName), new XElement(XName.Get("pPr", DocX.w.NamespaceName), new XElement(XName.Get("sectPr", DocX.w.NamespaceName)))
+            );
+
+            if (trackChanges)
+                newParagraphSection = HelperFunctions.CreateEdit(EditType.ins, DateTime.Now, newParagraphSection);
+
+            Xml.Add(newParagraphSection);
+        }
 
         public virtual Paragraph InsertParagraph(string text)
         {
-
             return InsertParagraph(text, false, new Formatting());
         }
 
