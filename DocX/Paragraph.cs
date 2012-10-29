@@ -36,9 +36,25 @@ namespace Novacode
         {
             get
             {
-                return ParagraphNumberPropertiesBacker ?? (ParagraphNumberPropertiesBacker = Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr"));
+              return ParagraphNumberPropertiesBacker ?? (ParagraphNumberPropertiesBacker = GetParagraphNumberProperties());
             }
         }
+
+      private XElement GetParagraphNumberProperties()
+      {
+        var numPrNode = Xml.Descendants().FirstOrDefault(el => el.Name.LocalName == "numPr");
+        if (numPrNode != null)
+        {
+          var numIdNode = numPrNode.Descendants().First(numId => numId.Name.LocalName == "numId");
+          var numIdAttribute = numIdNode.Attribute(DocX.w + "val");
+          if (numIdAttribute != null && numIdAttribute.Value.Equals("0"))
+          {
+            return null;
+          }
+        }
+
+        return numPrNode;
+      }
 
         private bool? IsListItemBacker { get; set; }
         /// <summary>
@@ -1367,7 +1383,16 @@ namespace Novacode
             // Returns the underlying XElement's Value property.
             get
             {
+              try
+              {
                 return HelperFunctions.GetFormattedText(Xml);
+
+              }
+              catch (Exception)
+              {
+                return null;
+              }            
+            
             }
         }
 
