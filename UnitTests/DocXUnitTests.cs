@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -1787,24 +1788,40 @@ namespace UnitTests
             }
         }
 
-        [TestMethod]
-        public void InsertANextPageBreakWithParagraphTextsShouldAddProperParagraphsToProperSections()
+      [TestMethod]
+      public void InsertANextPageBreakWithParagraphTextsShouldAddProperParagraphsToProperSections()
+      {
+        using (DocX document = DocX.Create("SectionPageBreakWithParagraphs.docx"))
         {
-            using (DocX document = DocX.Create("SectionPageBreakWithParagraphs.docx"))
-            {
-                document.InsertParagraph("First paragraph.");
-                document.InsertParagraph("Second paragraph.");
-                document.InsertSectionPageBreak();
-                document.InsertParagraph("Third paragraph.");
-                document.InsertParagraph("Fourth paragraph.");
+          document.InsertParagraph("First paragraph.");
+          document.InsertParagraph("Second paragraph.");
+          document.InsertSectionPageBreak();
+          document.InsertParagraph("Third paragraph.");
+          document.InsertParagraph("Fourth paragraph.");
 
-                var sections = document.GetSections();
-                Assert.AreEqual(sections.Count, 2);
+          var sections = document.GetSections();
+          Assert.AreEqual(sections.Count, 2);
 
-                Assert.AreEqual(sections[0].SectionParagraphs.Count(p => !string.IsNullOrWhiteSpace(p.Text)), 2);
-                Assert.AreEqual(sections[1].SectionParagraphs.Count(p => !string.IsNullOrWhiteSpace(p.Text)), 2);
-                document.Save();
-            }
+          Assert.AreEqual(sections[0].SectionParagraphs.Count(p => !string.IsNullOrWhiteSpace(p.Text)), 2);
+          Assert.AreEqual(sections[1].SectionParagraphs.Count(p => !string.IsNullOrWhiteSpace(p.Text)), 2);
+          document.Save();
         }
+      }
+
+      [TestMethod]
+        public void WhenAFontFamilyIsSpecifiedForAParagraphItShouldSetTheFontOfTheParagraphTextToTheFontFamily()
+        {
+          using (DocX document = DocX.Create("FontTest.docx"))
+          {
+            Paragraph p = document.InsertParagraph();
+
+            p.Append("Hello World").Font(new FontFamily("Century"));
+
+            Assert.AreEqual(p.MagicText[0].formatting.FontFamily.Name, "Century");
+
+            document.Save();
+          }
+        }
+
     }
 }

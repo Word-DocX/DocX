@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
@@ -2470,6 +2471,16 @@ namespace Novacode
                 return;
             }
 
+          var contentIsListOfFontProperties = false;
+          var fontProps = content as IEnumerable;
+          if (fontProps != null)
+          {
+            foreach (object property in fontProps)
+            {
+              contentIsListOfFontProperties = (property as XAttribute != null);
+            }
+          }
+
             foreach (XElement run in runs)
             {
                 rPr = run.Element(XName.Get("rPr", DocX.w.NamespaceName));
@@ -2481,6 +2492,22 @@ namespace Novacode
 
                 rPr.SetElementValue(textFormatPropName, value);
                 XElement last = rPr.Elements().Last();
+
+              if (contentIsListOfFontProperties) //if content is a list of attributes, as in the case when specifying a font family 
+              {
+                foreach (object property in fontProps)
+                {
+                  if (last.Attribute(((System.Xml.Linq.XAttribute) (property)).Name) == null)
+                  {
+                    last.Add(property); //Add this attribute if element doesn't have it
+                  }
+                  else
+                  {
+                    last.Attribute(((System.Xml.Linq.XAttribute) (property)).Name).Value =
+                      ((System.Xml.Linq.XAttribute) (property)).Value; //Apply value only if element already has it
+                  }
+                }
+              }
 
                 if (content as System.Xml.Linq.XAttribute != null)//If content is an attribute
                 {
