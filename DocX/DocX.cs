@@ -3275,13 +3275,17 @@ namespace Novacode
             }
             else
             {
-                // Set the length of this stream to 0
-                stream.SetLength(0);
+                if (stream.CanSeek) // 2013-05-25: Check if stream can be seeked to support System.Web.HttpResponseStream 
+                {
+                    // Set the length of this stream to 0
+                    stream.SetLength(0);
 
-                // Write to the beginning of the stream
-                stream.Position = 0;
+                    // Write to the beginning of the stream
+                    stream.Position = 0;
+                }
 
                 memoryStream.WriteTo(stream);
+                memoryStream.Flush();
             }
             #endregion
         }
