@@ -3608,13 +3608,14 @@ namespace Novacode
                 pid = pids.Max();
 
             // Check if a custom property already exists with this name
+            // 2013-05-25: IgnoreCase while searching for custom property as it would produce a currupted docx.
             var customProperty =
             (
                 from d in customPropDoc.Descendants()
-                where (d.Name.LocalName == "property") && (d.Attribute(XName.Get("name")).Value == cp.Name)
+                where (d.Name.LocalName == "property") && (d.Attribute(XName.Get("name")).Value.Equals(cp.Name,StringComparison.InvariantCultureIgnoreCase))
                 select d
             ).SingleOrDefault();
-
+            
             // If a custom property with this name already exists remove it.
             if (customProperty != null)
                 customProperty.Remove();
