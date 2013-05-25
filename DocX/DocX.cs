@@ -629,34 +629,21 @@ namespace Novacode
         {
 
             var allParas = Paragraphs;
-
-            var parasInASection = new List<Paragraph>();
             var sections = new List<Section>();
 
             foreach (var para in allParas)
             {
 
                 var sectionInPara = para.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "sectPr");
-
-                if (sectionInPara == null)
+                if (sectionInPara != null)
                 {
-                    parasInASection.Add(para);
+                    sections.Add(new Section(Document, sectionInPara));
                 }
-                else
-                {
-                    parasInASection.Add(para);
-                    var section = new Section(Document, sectionInPara) { SectionParagraphs = parasInASection };
-                    sections.Add(section);
-                    parasInASection = new List<Paragraph>();
-                }
-
             }
 
             XElement body = mainDoc.Root.Element(XName.Get("body", DocX.w.NamespaceName));
             XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
-            var baseSection = new Section(Document, baseSectionXml) { SectionParagraphs = parasInASection };
-            sections.Add(baseSection);
-
+            sections.Add(new Section(Document, baseSectionXml));
             return sections;
         }
 

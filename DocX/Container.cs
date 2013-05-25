@@ -80,45 +80,6 @@ namespace Novacode
         }
 
 
-
-        public virtual List<Section> Sections
-        {
-            get
-            {
-                var allParas = Paragraphs;
-
-                var parasInASection = new List<Paragraph>();
-                var sections = new List<Section>();
-
-                foreach (var para in allParas)
-                {
-
-                    var sectionInPara = para.Xml.Descendants().FirstOrDefault(s => s.Name.LocalName == "sectPr");
-
-                    if (sectionInPara == null)
-                    {
-                        parasInASection.Add(para);
-                    }
-                    else
-                    {
-                        parasInASection.Add(para);
-                        var section = new Section(Document, sectionInPara) { SectionParagraphs = parasInASection };
-                        sections.Add(section);
-                        parasInASection = new List<Paragraph>();
-                    }
-
-                }
-
-                XElement body = Xml.Element(XName.Get("body", DocX.w.NamespaceName));
-                XElement baseSectionXml = body.Element(XName.Get("sectPr", DocX.w.NamespaceName));
-                var baseSection = new Section(Document, baseSectionXml) { SectionParagraphs = parasInASection };
-                sections.Add(baseSection);
-
-                return sections;
-            }
-        }
-
-
         private void GetListItemType(Paragraph p)
         {
             var ilvlNode = p.ParagraphNumberProperties.Descendants().FirstOrDefault(el => el.Name.LocalName == "ilvl");
@@ -596,15 +557,7 @@ namespace Novacode
             return listItemType;
         }
 
-
-
-        public virtual void InsertSection()
-        {
-
-            InsertSection(false);
-        }
-
-        public virtual void InsertSection(bool trackChanges)
+        public virtual void InsertSection(bool trackChanges = false)
         {
             var newParagraphSection = new XElement
             (
