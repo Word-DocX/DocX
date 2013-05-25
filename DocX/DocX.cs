@@ -3633,7 +3633,7 @@ namespace Novacode
                     new XAttribute("fmtid", "{D5CDD505-2E9C-101B-9397-08002B2CF9AE}"),
                     new XAttribute("pid", pid + 1),
                     new XAttribute("name", cp.Name),
-                        new XElement(customVTypesSchema + cp.Type, cp.Value)
+                        new XElement(customVTypesSchema + cp.Type, cp.Value??"")
                 )
             );
 
@@ -3642,7 +3642,7 @@ namespace Novacode
                 customPropDoc.Save(tw, SaveOptions.None);
 
             // Refresh all fields in this document which display this custom property.
-            UpdateCustomPropertyValue(this, cp.Name, cp.Value.ToString());
+            UpdateCustomPropertyValue(this, cp.Name, (cp.Value ?? "").ToString());
         }
 
         /// <summary>
