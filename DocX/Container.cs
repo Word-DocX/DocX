@@ -319,7 +319,7 @@ namespace Novacode
                 List<int> indexes = p.FindAll(str, options);
 
                 for (int i = 0; i < indexes.Count(); i++)
-                    indexes[0] += p.startIndex;
+                    indexes[i] += p.startIndex;
 
                 list.AddRange(indexes);
             }
